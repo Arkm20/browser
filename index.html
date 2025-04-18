@@ -2,124 +2,362 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Horizon New Tab</title>
+  <title>Space Horizon • New Tab</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
+    /* ─── Reset & Base ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      background: #1a1a1a;
-      font-family: 'Segoe UI', sans-serif;
-      color: white;
+      width: 100%; height: 100%;
+      background: #000;
+      color: #EEE;
+      font-family: "Segoe UI", Roboto, sans-serif;
       overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
     }
 
-    .blob {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 500px;
-      height: 500px;
-      background: linear-gradient(135deg, #66a2de, #9d50bb);
-      opacity: 0.2;
-      filter: blur(120px);
-      transform: translate(-50%, -50%);
-      animation: blobmove 20s infinite ease-in-out;
+    /* ─── Enhanced Starfield (multiple layers) ─── */
+    .stars {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
       z-index: 0;
     }
-
-    @keyframes blobmove {
-      0%, 100% {
-        transform: translate(-50%, -50%) scale(1);
-      }
-      50% {
-        transform: translate(-50%, -60%) scale(1.2);
-      }
+    .stars-small {
+      background-image: radial-gradient(1px 1px at 20% 30%, #FFF 100%, transparent),
+                        radial-gradient(1px 1px at 40% 70%, #FFF 100%, transparent),
+                        radial-gradient(1px 1px at 50% 40%, #FFF 100%, transparent),
+                        radial-gradient(1px 1px at 80% 10%, #FFF 100%, transparent);
+      background-size: 550px 550px;
+      animation: drift 60s linear infinite;
+    }
+    .stars-medium {
+      background-image: radial-gradient(1.5px 1.5px at 15% 15%, #FFF 100%, transparent),
+                        radial-gradient(1.5px 1.5px at 35% 45%, #FFF 100%, transparent),
+                        radial-gradient(1.5px 1.5px at 55% 65%, #FFF 100%, transparent),
+                        radial-gradient(1.5px 1.5px at 85% 25%, #FFF 100%, transparent);
+      background-size: 700px 700px;
+      animation: drift 90s linear infinite;
+    }
+    .stars-large {
+      background-image: radial-gradient(2px 2px at 10% 55%, #FFF 100%, transparent),
+                        radial-gradient(2px 2px at 30% 25%, #FFF 100%, transparent),
+                        radial-gradient(2px 2px at 65% 45%, #FFF 100%, transparent),
+                        radial-gradient(2px 2px at 90% 85%, #FFF 100%, transparent);
+      background-size: 950px 950px;
+      animation: drift 120s linear infinite;
+    }
+    @keyframes drift {
+      from { background-position: 0 0; }
+      to   { background-position: 100px 100px; }
     }
 
+    /* ─── Shooting Stars Animation ─── */
+    .shooting-star {
+      position: absolute;
+      height: 2px;
+      background: linear-gradient(90deg, #FFF, transparent);
+      animation: shoot 3s linear infinite;
+      opacity: 0;
+    }
+    .shooting-star:nth-child(1) {
+      top: 20%; left: 10%;
+      width: 100px;
+      transform: rotate(35deg);
+      animation-delay: 0s;
+    }
+    .shooting-star:nth-child(2) {
+      top: 35%; right: 15%;
+      width: 150px;
+      transform: rotate(-50deg);
+      animation-delay: 4s;
+    }
+    .shooting-star:nth-child(3) {
+      top: 70%; left: 20%;
+      width: 120px;
+      transform: rotate(15deg);
+      animation-delay: 7s;
+    }
+    @keyframes shoot {
+      0% { transform: translateX(0) rotate(var(--rotation, 35deg)); opacity: 0; }
+      15% { opacity: 1; }
+      70% { opacity: 1; }
+      100% { transform: translateX(500px) rotate(var(--rotation, 35deg)); opacity: 0; }
+    }
+
+    /* ─── Multiple Nebula Blobs ─── */
+    .nebula {
+      position: absolute;
+      filter: blur(180px);
+      z-index: 1;
+    }
+    .nebula-1 {
+      top: 30%; left: 30%;
+      width: 800px; height: 800px;
+      background: radial-gradient(circle at 30% 30%, rgba(102,162,222,0.2), transparent 70%);
+      animation: blobmove 40s ease-in-out infinite;
+    }
+    .nebula-2 {
+      bottom: 20%; right: 35%;
+      width: 700px; height: 700px;
+      background: radial-gradient(circle at 70% 70%, rgba(157,80,187,0.2), transparent 70%);
+      animation: blobmove 50s ease-in-out infinite reverse;
+    }
+    .nebula-3 {
+      top: 60%; left: 60%;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle at 50% 50%, rgba(230,120,50,0.15), transparent 70%);
+      animation: blobmove 45s ease-in-out infinite 10s;
+    }
+    @keyframes blobmove {
+      0%,100% { transform: translate(-50%, -50%) scale(1); }
+      50%     { transform: translate(-45%, -55%) scale(1.1); }
+    }
+
+    /* ─── Planet Animation ─── */
+    .planet {
+      position: absolute;
+      border-radius: 50%;
+      z-index: 2;
+    }
+    .planet-1 {
+      width: 80px; height: 80px;
+      top: 15%; right: 12%;
+      background: radial-gradient(circle at 30% 30%, #c44, #622);
+      box-shadow: inset -10px -10px 15px rgba(0,0,0,0.5), 0 0 20px rgba(255,100,100,0.3);
+      animation: orbit 120s linear infinite;
+    }
+    .planet-2 {
+      width: 40px; height: 40px;
+      bottom: 20%; left: 12%;
+      background: radial-gradient(circle at 30% 30%, #4ac, #246);
+      box-shadow: inset -5px -5px 10px rgba(0,0,0,0.5), 0 0 15px rgba(100,150,255,0.3);
+      animation: orbit 80s linear infinite reverse;
+    }
+    @keyframes orbit {
+      0% { transform: rotate(0deg) translateX(30px) rotate(0deg); }
+      100% { transform: rotate(360deg) translateX(30px) rotate(-360deg); }
+    }
+
+    /* ─── Layout ─── */
     .container {
       position: relative;
-      z-index: 1;
-      height: 100%;
+      z-index: 5;
+      width: 90%;
+      max-width: 500px;
+      padding: 1.5rem;
+      text-align: center;
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      align-items: center;
       gap: 1.5rem;
-      text-align: center;
+      background: rgba(0,0,0,0.2);
+      backdrop-filter: blur(5px);
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.1);
     }
 
+    /* ─── Branding ─── */
     .brand {
       font-size: 2.5rem;
-      font-weight: bold;
-      letter-spacing: 2px;
-      color: #66a2de;
+      font-weight: 700;
+      letter-spacing: 3px;
+      background: linear-gradient(45deg, #66a2de, #9d50bb);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 30px rgba(102, 162, 222, 0.5);
       user-select: none;
     }
 
-    .clock {
-      font-size: 1.2rem;
-      opacity: 0.8;
+    /* ─── Current Time Display ─── */
+    .time-display {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin: 0.5rem 0;
+      font-family: monospace;
+    }
+    .time-segment {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .time-segment .value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      min-width: 2.5ch;
+      background: rgba(255,255,255,0.1);
+      padding: 0.5rem;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    .time-segment .label {
+      font-size: 0.7rem;
+      margin-top: 0.3rem;
+      color: #AAA;
+      text-transform: uppercase;
     }
 
-    .search-box {
-      width: 90%;
-      max-width: 600px;
-      padding: 16px 20px;
-      font-size: 18px;
+    /* ─── Search Capsule ─── */
+    .search-form {
+      display: flex;
+      width: 100%;
+      border-radius: 40px;
+      background: rgba(255,255,255,0.05);
+      box-shadow: 0 4px 30px rgba(0,0,0,0.5);
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255,255,255,0.1);
+      overflow: hidden;
+    }
+    .search-form input {
+      flex: 1;
+      padding: 12px 16px;
+      font-size: 1rem;
+      color: #FFF;
+      background: transparent;
       border: none;
-      border-radius: 30px;
-      background-color: #2c2c2c;
-      color: #ffffff;
       outline: none;
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+    }
+    .search-form input::placeholder {
+      color: #BBB;
+    }
+    .search-form button {
+      padding: 0 1.2rem;
+      background: linear-gradient(45deg, #66a2de, #9d50bb);
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .search-form button:hover {
+      opacity: 0.85;
+    }
+    .search-form button:active {
+      opacity: 0.7;
+    }
+    .search-form button svg {
+      width: 20px; height: 20px;
+      fill: #FFF;
     }
 
-    .search-box::placeholder {
-      color: #888;
+    /* Mobile-specific adjustments */
+    @media (max-width: 480px) {
+      .container {
+        padding: 1.2rem;
+        gap: 1.2rem;
+      }
+      .brand {
+        font-size: 2rem;
+      }
+      .time-segment .value {
+        font-size: 1.5rem;
+        padding: 0.4rem;
+      }
+      .time-segment .label {
+        font-size: 0.6rem;
+      }
+      .search-form input {
+        padding: 10px 14px;
+      }
+      .planet-1 {
+        width: 60px; height: 60px;
+      }
+      .planet-2 {
+        width: 30px; height: 30px;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="blob"></div>
+  <!-- Enhanced Star Layers -->
+  <div class="stars stars-small"></div>
+  <div class="stars stars-medium"></div>
+  <div class="stars stars-large"></div>
+
+  <!-- Shooting Stars -->
+  <div class="shooting-star"></div>
+  <div class="shooting-star"></div>
+  <div class="shooting-star"></div>
+
+  <!-- Nebula Effects -->
+  <div class="nebula nebula-1"></div>
+  <div class="nebula nebula-2"></div>
+  <div class="nebula nebula-3"></div>
+
+  <!-- Planet Animations -->
+  <div class="planet planet-1"></div>
+  <div class="planet planet-2"></div>
+
   <div class="container">
-    <div class="brand">Horizon</div>
-    <div class="clock" id="clock">--:--:--</div>
-    <form onsubmit="handleSearch(event)">
-      <input type="text" class="search-box" id="input" placeholder="New Tab" autocomplete="off" />
+    <div class="brand">Space Horizon</div>
+
+    <!-- Current Time Display -->
+    <div class="time-display">
+      <div class="time-segment">
+        <div class="value" id="hours">--</div>
+        <div class="label">Hours</div>
+      </div>
+      <div class="time-segment">
+        <div class="value" id="minutes">--</div>
+        <div class="label">Minutes</div>
+      </div>
+      <div class="time-segment">
+        <div class="value" id="seconds">--</div>
+        <div class="label">Seconds</div>
+      </div>
+    </div>
+
+    <form class="search-form" onsubmit="handleSearch(event)">
+      <input type="text" id="input" placeholder="Navigate the cosmos..." autocomplete="off" />
+      <button type="submit" aria-label="Launch">
+        <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C8.01 14 6 11.99 6 9.5S8.01 5 10.5 5 15 7.01 15 9.5 12.99 14 10.5 14z"/></svg>
+      </button>
     </form>
   </div>
 
   <script>
-    // Update time every second
-    function updateClock() {
+    // ─── Current Time Display ───
+    function updateTimeDisplay() {
       const now = new Date();
-      const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      document.getElementById('clock').textContent = time;
+      
+      const hours = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      const seconds = now.getSeconds().toString().padStart(2, '0');
+      
+      document.getElementById('hours').textContent = hours;
+      document.getElementById('minutes').textContent = minutes;
+      document.getElementById('seconds').textContent = seconds;
     }
-    setInterval(updateClock, 1000);
-    updateClock();
-
-    // Smart redirect
-    function handleSearch(event) {
-      event.preventDefault();
-      const input = document.getElementById('input').value.trim();
-      if (!input) return;
-
-      // Regex to detect URL
-      const urlPattern = /^(https?:\/\/)?([\w\-]+\.)+[a-z]{2,}(\/[\w\-._~:/?#[\]@!$&'()*+,;=]*)?$/i;
-
-      if (urlPattern.test(input)) {
-        let url = input;
-        if (!/^https?:\/\//i.test(url)) {
-          url = 'https://' + url;
-        }
-        window.location.href = url;
+    
+    // ─── Smart Search/URL Redirect ───
+    function handleSearch(e) {
+      e.preventDefault();
+      const v = document.getElementById('input').value.trim();
+      if (!v) return;
+      // URL detection
+      const urlRe = /^(https?:\/\/)?([\w-]+\.)+[a-z]{2,}(\/.*)?$/i;
+      if (urlRe.test(v)) {
+        let u = v;
+        if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
+        window.location.href = u;
       } else {
-        const query = encodeURIComponent(input);
-        window.location.href = `https://www.google.com/search?q=${query}`;
+        const q = encodeURIComponent(v);
+        window.location.href = `https://www.google.com/search?q=${q}`;
       }
+    }
+    
+    // ─── Check if device is mobile ───
+    function isMobileDevice() {
+      return (window.innerWidth <= 768);
+    }
+    
+    // Initialize and start timers
+    setInterval(updateTimeDisplay, 1000);
+    updateTimeDisplay();
+    
+    // Adjust some elements for mobile
+    if (isMobileDevice()) {
+      // Any additional mobile-specific JS adjustments can go here
+      document.querySelectorAll('.nebula').forEach(nebula => {
+        nebula.style.filter = 'blur(100px)';
+      });
     }
   </script>
 </body>
