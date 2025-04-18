@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Horizon New Tab</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #1a1a1a;
+      font-family: 'Segoe UI', sans-serif;
+      color: white;
+      overflow: hidden;
+    }
+
+    .blob {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 500px;
+      height: 500px;
+      background: linear-gradient(135deg, #66a2de, #9d50bb);
+      opacity: 0.2;
+      filter: blur(120px);
+      transform: translate(-50%, -50%);
+      animation: blobmove 20s infinite ease-in-out;
+      z-index: 0;
+    }
+
+    @keyframes blobmove {
+      0%, 100% {
+        transform: translate(-50%, -50%) scale(1);
+      }
+      50% {
+        transform: translate(-50%, -60%) scale(1.2);
+      }
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 1.5rem;
+      text-align: center;
+    }
+
+    .brand {
+      font-size: 2.5rem;
+      font-weight: bold;
+      letter-spacing: 2px;
+      color: #66a2de;
+      user-select: none;
+    }
+
+    .clock {
+      font-size: 1.2rem;
+      opacity: 0.8;
+    }
+
+    .search-box {
+      width: 90%;
+      max-width: 600px;
+      padding: 16px 20px;
+      font-size: 18px;
+      border: none;
+      border-radius: 30px;
+      background-color: #2c2c2c;
+      color: #ffffff;
+      outline: none;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+    }
+
+    .search-box::placeholder {
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <div class="blob"></div>
+  <div class="container">
+    <div class="brand">Horizon</div>
+    <div class="clock" id="clock">--:--:--</div>
+    <form onsubmit="handleSearch(event)">
+      <input type="text" class="search-box" id="input" placeholder="New Tab" autocomplete="off" />
+    </form>
+  </div>
+
+  <script>
+    // Update time every second
+    function updateClock() {
+      const now = new Date();
+      const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      document.getElementById('clock').textContent = time;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Smart redirect
+    function handleSearch(event) {
+      event.preventDefault();
+      const input = document.getElementById('input').value.trim();
+      if (!input) return;
+
+      // Regex to detect URL
+      const urlPattern = /^(https?:\/\/)?([\w\-]+\.)+[a-z]{2,}(\/[\w\-._~:/?#[\]@!$&'()*+,;=]*)?$/i;
+
+      if (urlPattern.test(input)) {
+        let url = input;
+        if (!/^https?:\/\//i.test(url)) {
+          url = 'https://' + url;
+        }
+        window.location.href = url;
+      } else {
+        const query = encodeURIComponent(input);
+        window.location.href = `https://www.google.com/search?q=${query}`;
+      }
+    }
+  </script>
+</body>
+</html>
