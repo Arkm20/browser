@@ -237,261 +237,6 @@
       fill: #FFF;
     }
 
-    /* ─── Quick Actions Shelf ─── */
-    .shelf-pull-indicator {
-      position: fixed;
-      bottom: 15px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 70px;
-      height: 5px;
-      background: rgba(255,255,255,0.2);
-      border-radius: 10px;
-      z-index: 10;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    .shelf-pull-indicator:hover {
-      background: rgba(255,255,255,0.4);
-      width: 80px;
-    }
-    .shelf-pull-indicator::after {
-      content: '';
-      position: absolute;
-      top: -15px;
-      left: 0;
-      right: 0;
-      height: 20px;
-    }
-    
-    .quick-actions-shelf {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 180px;
-      background: rgba(0,0,0,0.7);
-      backdrop-filter: blur(10px);
-      border-top: 1px solid rgba(255,255,255,0.1);
-      z-index: 10;
-      transform: translateY(100%);
-      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-      display: flex;
-      flex-direction: column;
-      border-top-left-radius: 20px;
-      border-top-right-radius: 20px;
-      overflow: hidden;
-    }
-    .quick-actions-shelf.active {
-      transform: translateY(0);
-    }
-    
-    .shelf-header {
-      padding: 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-    }
-    .shelf-title {
-      font-size: 1.2rem;
-      font-weight: 600;
-      background: linear-gradient(45deg, #66a2de, #9d50bb);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      letter-spacing: 1px;
-    }
-    .shelf-actions {
-      display: flex;
-      gap: 16px;
-    }
-    .shelf-action-btn {
-      background: none;
-      border: none;
-      color: #AAA;
-      cursor: pointer;
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      padding: 4px 8px;
-      border-radius: 12px;
-      transition: all 0.2s;
-    }
-    .shelf-action-btn:hover {
-      background: rgba(255,255,255,0.1);
-      color: #FFF;
-    }
-    .shelf-action-btn svg {
-      width: 16px;
-      height: 16px;
-      fill: currentColor;
-    }
-    
-    .shelf-content {
-      flex: 1;
-      padding: 16px;
-      overflow-x: auto;
-      display: flex;
-      gap: 20px;
-      scrollbar-width: thin;
-    }
-    .shelf-content::-webkit-scrollbar {
-      height: 4px;
-    }
-    .shelf-content::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    .shelf-content::-webkit-scrollbar-thumb {
-      background: rgba(255,255,255,0.2);
-      border-radius: 10px;
-    }
-    
-    .quick-action {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      min-width: 70px;
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
-    .quick-action:hover {
-      transform: translateY(-5px);
-    }
-    .quick-action-icon {
-      width: 50px;
-      height: 50px;
-      border-radius: 15px;
-      background: rgba(255,255,255,0.1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
-    }
-    .quick-action-icon::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(45deg, rgba(102,162,222,0.3), rgba(157,80,187,0.3));
-      opacity: 0;
-      transition: opacity 0.2s;
-    }
-    .quick-action:hover .quick-action-icon::before {
-      opacity: 1;
-    }
-    .quick-action-icon svg {
-      width: 26px;
-      height: 26px;
-      fill: #FFF;
-      position: relative;
-      z-index: 1;
-    }
-    .quick-action-label {
-      font-size: 0.8rem;
-      color: #CCC;
-      text-align: center;
-    }
-    
-    /* ─── Hidden Section ─── */
-    .hidden-section {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 250px;
-      background: rgba(0,0,0,0.8);
-      backdrop-filter: blur(15px);
-      border-top: 1px solid rgba(157,80,187,0.4);
-      z-index: 9;
-      transform: translateY(100%);
-      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .hidden-section.active {
-      transform: translateY(0);
-    }
-    
-    .hidden-header {
-      padding: 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid rgba(157,80,187,0.2);
-    }
-    .hidden-title {
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: #9d50bb;
-      letter-spacing: 1px;
-    }
-    .hidden-close {
-      background: none;
-      border: none;
-      color: #9d50bb;
-      cursor: pointer;
-      font-size: 1.5rem;
-      line-height: 1;
-      padding: 4px;
-      transition: all 0.2s;
-    }
-    .hidden-close:hover {
-      color: #FFF;
-    }
-    
-    .hidden-content {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-      gap: 15px;
-      padding: 16px;
-      overflow-y: auto;
-      max-height: calc(100% - 60px);
-    }
-    
-    .hidden-item {
-      background: rgba(255,255,255,0.05);
-      border-radius: 12px;
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      transition: all 0.2s;
-      border: 1px solid rgba(157,80,187,0.2);
-    }
-    .hidden-item:hover {
-      background: rgba(157,80,187,0.1);
-      transform: translateY(-3px);
-    }
-    .hidden-item-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: rgba(157,80,187,0.2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .hidden-item-icon svg {
-      width: 24px;
-      height: 24px;
-      fill: #FFF;
-    }
-    .hidden-item-title {
-      font-size: 0.8rem;
-      color: #DDD;
-      text-align: center;
-    }
-    .hidden-item-description {
-      font-size: 0.7rem;
-      color: #AAA;
-      text-align: center;
-    }
-    
     /* Mobile-specific adjustments */
     @media (max-width: 480px) {
       .container {
@@ -517,23 +262,6 @@
       .planet-2 {
         width: 30px; height: 30px;
       }
-      .quick-actions-shelf {
-        height: 160px;
-      }
-      .shelf-content {
-        padding: 10px;
-        gap: 15px;
-      }
-      .quick-action-icon {
-        width: 45px;
-        height: 45px;
-      }
-      .quick-action-label {
-        font-size: 0.7rem;
-      }
-      .hidden-section {
-        height: 220px;
-      }
     }
   </style>
 </head>
@@ -552,10 +280,6 @@
   <div class="nebula nebula-1"></div>
   <div class="nebula nebula-2"></div>
   <div class="nebula nebula-3"></div>
-  
-  <!-- Planets -->
-  <div class="planet planet-1"></div>
-  <div class="planet planet-2"></div>
 
   <div class="container">
     <div class="brand">HORIZON</div>
@@ -580,41 +304,77 @@
       <input type="text" id="input" placeholder="Navigate the cosmos..." autocomplete="off" />
       <button type="submit" aria-label="Launch">
         <svg id="Space Rocket Flying" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <rect width="24" height="24" fill="none" opacity="0"/>
-          <g transform="matrix(0.83 0 0 0.83 12 12)">
-            <g>
-              <g style="" >
-                <g transform="matrix(1 0 0 1 1.33 6.28)" >
-                  <path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform=" translate(-13.33, -18.28)" d="M 11 19 C 10.809407569368096 19.199195942164113 10.566965771497662 19.34119756663108 10.3 19.41 C 10.196215886072133 19.441540638043417 10.121382906191085 19.53212792947837 10.110000000000001 19.64 L 9.9 21.7 C 9.84354195120435 22.165805492822482 10.088770006767419 22.616144836710884 10.510680178953338 22.821459412480504 C 10.932590351139257 23.02677398825012 11.438289670833246 22.941859195957402 11.77 22.61 L 14.629999999999999 19.75 C 15.370158973279754 18.994311229092705 15.960555399419269 18.105323506974585 16.369999999999997 17.13 C 16.630488733113996 16.076525273126617 16.76145657716813 14.995201022218115 16.759999999999998 13.910000000000002 C 16.764146254892523 13.801420153620313 16.7003335359354 13.701712780249808 16.599999999999998 13.659999999999998 C 16.498874786427617 13.616170344957652 16.381443962554734 13.635742148936465 16.299999999999997 13.709999999999999 Z" stroke-linecap="round" />
-                </g>
-                <g transform="matrix(1 0 0 1 -6.28 -1.34)" >
-                  <path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform=" translate(-5.72, -10.66)" d="M 5 13 C 5 13 7.52 10.46 10.3 7.68 C 10.375032259031814 7.602973627312725 10.394906091559642 7.487705398651318 10.350000000000001 7.39 C 10.31076887509188 7.287615318555161 10.209402985524369 7.222741149231954 10.100000000000001 7.2299999999999995 C 8.988857181901203 7.214883263604519 7.880205204275035 7.339186667156547 6.799999999999996 7.600000000000004 C 5.842195225015241 8.0179680514796 4.973231826906527 8.61538038767934 4.239999999999997 9.360000000000003 L 1.39 12.21 C 1.0735498914513792 12.524669604705378 0.9785772990465238 12.999348903303728 1.1495969812555393 13.411550188628022 C 1.3206166634645549 13.823751473952315 1.7237327328634746 14.091776966057608 2.17 14.09 L 4.41 13.82 C 4.512543893185512 13.808946139843021 4.598859306740087 13.738324437843824 4.63 13.64 C 4.700988242225715 13.400409460145466 4.827792157328171 13.181072958346624 5 13 Z" stroke-linecap="round" />
-                </g>
-                <g transform="matrix(1 0 0 1 -8.19 8.11)" >
-                  <path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform=" translate(-3.81, -20.11)" d="M 5.62 16.85 C 4.72 15.950000000000001 3.35 16.1 2.21 17.23 C 1.41 18 0.59 20.62 0 22.65 C -0.08614590176304039 23.00756239755743 0.015596458005847191 23.384385952257013 0.27000000000000013 23.65 C 0.5374511525251731 23.90112924968888 0.9124981281218356 24.002391933099975 1.27 23.919999999999998 C 3.27 23.36 5.869999999999999 22.529999999999998 6.67 21.729999999999997 C 7.81 20.599999999999998 7.96 19.229999999999997 7.05 18.33 Z" stroke-linecap="round" />
-                </g>
-                <g transform="matrix(1 0 0 1 3.14 -3.13)" >
-                  <path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform=" translate(-15.14, -8.87)" d="M 23.36 0 C 22.03 0.27 19.36 0.9 18.509999999999998 1.73 L 6.35 13.93 C 6.250892850682708 14.037280692234166 6.250892850682708 14.202719307765834 6.35 14.31 L 9.709999999999999 17.66 C 9.757381117769473 17.71212855945152 9.824556000741188 17.741848282792 9.895 17.741848282792 C 9.96544399925881 17.741848282792 10.032618882230524 17.71212855945152 10.079999999999998 17.66 L 22.26 5.49 C 23.09 4.65 23.72 2 24 0.63 C 24.03223243144137 0.4580762635341492 23.975867548231935 0.2814662961445847 23.85 0.1600000000000001 C 23.725348904765596 0.02548294501529283 23.540014806734593 -0.035034311484625685 23.36 0 Z" stroke-linecap="round" />
-                </g>
-              </g>
-            </g>
-          </g>
-        </svg>
+    <rect width="24" height="24" fill="none" opacity="0"/>
+    <g transform="matrix(0.83 0 0 0.83 12 12)">
+      <g>
+        <g style="" >
+<g transform="matrix(1 0 0 1 1.33 6.28)" >
+<path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform=" translate(-13.33, -18.28)" d="M 11 19 C 10.809407569368096 19.199195942164113 10.566965771497662 19.34119756663108 10.3 19.41 C 10.196215886072133 19.441540638043417 10.121382906191085 19.53212792947837 10.110000000000001 19.64 L 9.9 21.7 C 9.84354195120435 22.165805492822482 10.088770006767419 22.616144836710884 10.510680178953338 22.821459412480504 C 10.932590351139257 23.02677398825012 11.438289670833246 22.941859195957402 11.77 22.61 L 14.629999999999999 19.75 C 15.370158973279754 18.994311229092705 15.960555399419269 18.105323506974585 16.369999999999997 17.13 C 16.630488733113996 16.076525273126617 16.76145657716813 14.995201022218115 16.759999999999998 13.910000000000002 C 16.764146254892523 13.801420153620313 16.7003335359354 13.701712780249808 16.599999999999998 13.659999999999998 C 16.498874786427617 13.616170344957652 16.381443962554734 13.635742148936465 16.299999999999997 13.709999999999999 Z" stroke-linecap="round" />
+</g>
+<g transform="matrix(1 0 0 1 -6.28 -1.34)" >
+<path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform=" translate(-5.72, -10.66)" d="M 5 13 C 5 13 7.52 10.46 10.3 7.68 C 10.375032259031814 7.602973627312725 10.394906091559642 7.487705398651318 10.350000000000001 7.39 C 10.31076887509188 7.287615318555161 10.209402985524369 7.222741149231954 10.100000000000001 7.2299999999999995 C 8.988857181901203 7.214883263604519 7.880205204275035 7.339186667156547 6.799999999999996 7.600000000000004 C 5.842195225015241 8.0179680514796 4.973231826906527 8.61538038767934 4.239999999999997 9.360000000000003 L 1.39 12.21 C 1.0735498914513792 12.524669604705378 0.9785772990465238 12.999348903303728 1.1495969812555393 13.411550188628022 C 1.3206166634645549 13.823751473952315 1.7237327328634746 14.091776966057608 2.17 14.09 L 4.41 13.82 C 4.512543893185512 13.808946139843021 4.598859306740087 13.738324437843824 4.63 13.64 C 4.700988242225715 13.400409460145466 4.827792157328171 13.181072958346624 5 13 Z" stroke-linecap="round" />
+</g>
+<g transform="matrix(1 0 0 1 -8.19 8.11)" >
+<path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform=" translate(-3.81, -20.11)" d="M 5.62 16.85 C 4.72 15.950000000000001 3.35 16.1 2.21 17.23 C 1.41 18 0.59 20.62 0 22.65 C -0.08614590176304039 23.00756239755743 0.015596458005847191 23.384385952257013 0.27000000000000013 23.65 C 0.5374511525251731 23.90112924968888 0.9124981281218356 24.002391933099975 1.27 23.919999999999998 C 3.27 23.36 5.869999999999999 22.529999999999998 6.67 21.729999999999997 C 7.81 20.599999999999998 7.96 19.229999999999997 7.05 18.33 Z" stroke-linecap="round" />
+</g>
+<g transform="matrix(1 0 0 1 3.14 -3.13)" >
+<path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform=" translate(-15.14, -8.87)" d="M 23.36 0 C 22.03 0.27 19.36 0.9 18.509999999999998 1.73 L 6.35 13.93 C 6.250892850682708 14.037280692234166 6.250892850682708 14.202719307765834 6.35 14.31 L 9.709999999999999 17.66 C 9.757381117769473 17.71212855945152 9.824556000741188 17.741848282792 9.895 17.741848282792 C 9.96544399925881 17.741848282792 10.032618882230524 17.71212855945152 10.079999999999998 17.66 L 22.26 5.49 C 23.09 4.65 23.72 2 24 0.63 C 24.03223243144137 0.4580762635341492 23.975867548231935 0.2814662961445847 23.85 0.1600000000000001 C 23.725348904765596 0.02548294501529283 23.540014806734593 -0.035034311484625685 23.36 0 Z" stroke-linecap="round" />
+</g>
+      </g>
+    </g>
+  </svg>
       </button>
     </form>
   </div>
 
-  <!-- Quick Actions Shelf Pull Indicator -->
-  <div class="shelf-pull-indicator" id="shelf-indicator"></div>
-  
-  <!-- Quick Actions Shelf -->
-  <div class="quick-actions-shelf" id="quick-actions-shelf">
-    <div class="shelf-header">
-      <div class="shelf-title">QUICK LAUNCH</div>
-      <div class="shelf-actions">
-        <button class="shelf-action-btn" id="edit-btn">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/></svg>
-          Edit
-        </button>
-        <button class="shelf-action-btn" id="secret-btn">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12,9A3,3 0 0,0 9
+
+  <script>
+    // ─── Current Time Display ───
+    function updateTimeDisplay() {
+      const now = new Date();
+      
+      const hours = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      const seconds = now.getSeconds().toString().padStart(2, '0');
+      
+      document.getElementById('hours').textContent = hours;
+      document.getElementById('minutes').textContent = minutes;
+      document.getElementById('seconds').textContent = seconds;
+    }
+    
+    // ─── Smart Search/URL Redirect ───
+    function handleSearch(e) {
+      e.preventDefault();
+      const v = document.getElementById('input').value.trim();
+      if (!v) return;
+      // URL detection
+      const urlRe = /^(https?:\/\/)?([\w-]+\.)+[a-z]{2,}(\/.*)?$/i;
+      if (urlRe.test(v)) {
+        let u = v;
+        if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
+        window.location.href = u;
+      } else {
+        const q = encodeURIComponent(v);
+        window.location.href = `https://www.google.com/search?q=${q}`;
+      }
+    }
+    
+    // ─── Check if device is mobile ───
+    function isMobileDevice() {
+      return (window.innerWidth <= 768);
+    }
+    
+    // Initialize and start timers
+    setInterval(updateTimeDisplay, 1000);
+    updateTimeDisplay();
+    
+    // Adjust some elements for mobile
+    if (isMobileDevice()) {
+      // Any additional mobile-specific JS adjustments can go here
+      document.querySelectorAll('.nebula').forEach(nebula => {
+        nebula.style.filter = 'blur(100px)';
+      });
+    }
+  </script>
+</body>
+</html>
