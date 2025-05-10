@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>Space Horizon • New Tab</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="images/favicon.png" type="image/png">
   <style>
     /* ─── Reset & Base ─── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -12,9 +13,14 @@
       background: #000;
       color: #EEE;
       font-family: "Segoe UI", Roboto, sans-serif;
-      overflow: hidden;
+      overflow: hidden; /* Keep this if main content isn't meant to scroll */
       display: flex; align-items: center; justify-content: center;
     }
+    /* Add padding to body if shelf might overlap scrollable content at the bottom,
+       but for this centered, non-scrolling layout, it might not be needed unless content changes.
+       Adjust if necessary, especially for mobile. */
+    /* @media (max-width: 480px) { body { padding-bottom: 80px; } } */
+
 
     /* ─── Enhanced Starfield (multiple layers) ─── */
     .stars {
@@ -58,6 +64,8 @@
       background: linear-gradient(90deg, #FFF, transparent);
       animation: shoot 3s linear infinite;
       opacity: 0;
+      /* Ensure shooting stars are behind UI elements like shelf/modal if they conflict */
+      z-index: 1; /* Higher than stars, lower than other UI */
     }
     .shooting-star:nth-child(1) {
       top: 20%; left: 10%;
@@ -88,7 +96,7 @@
     .nebula {
       position: absolute;
       filter: blur(180px);
-      z-index: 1;
+      z-index: 1; /* Kept same as original, ensure shooting stars can appear over them if desired, or adjust */
     }
     .nebula-1 {
       top: 30%; left: 30%;
@@ -153,6 +161,7 @@
       backdrop-filter: blur(5px);
       border-radius: 20px;
       border: 1px solid rgba(255,255,255,0.1);
+      margin-bottom: 100px; /* Ensure space for the shelf below */
     }
 
     /* ─── Branding ─── */
@@ -234,7 +243,204 @@
     }
     .search-form button svg {
       width: 20px; height: 20px;
-      fill: #FFF;
+      fill: #FFF; /* Ensures SVG is white */
+    }
+
+    /* ─── Quick Actions Shelf ─── */
+    .quick-actions-shelf {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 10px 0;
+      background: rgba(10, 10, 20, 0.6); /* Darker, slightly transparent */
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 10;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 -5px 15px rgba(0,0,0,0.3);
+      height: 75px; /* Fixed height for the shelf */
+    }
+
+    .quick-actions-content-wrapper {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      max-width: 95%;
+      overflow-x: auto; /* Horizontal scrolling for actions */
+      overflow-y: hidden;
+      padding: 5px 10px; /* Padding for scrollable content */
+      scrollbar-width: thin; /* For Firefox */
+      scrollbar-color: rgba(255,255,255,0.2) transparent; /* For Firefox */
+    }
+
+    .quick-actions-content-wrapper::-webkit-scrollbar {
+      height: 5px; /* Height of horizontal scrollbar */
+    }
+    .quick-actions-content-wrapper::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .quick-actions-content-wrapper::-webkit-scrollbar-thumb {
+      background-color: rgba(255,255,255,0.2);
+      border-radius: 10px;
+      border: 1px solid rgba(0,0,0,0.2);
+    }
+    
+    .actions-container, .locked-actions-container {
+      display: flex;
+      gap: 12px; /* Gap between action items */
+    }
+
+    .action-item, .unlock-button {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      color: #DDD;
+      padding: 6px;
+      border-radius: 10px;
+      background-color: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: background-color 0.2s, transform 0.2s;
+      cursor: pointer;
+      min-width: 65px; /* Ensure items have some width */
+      height: 55px; /* Fixed height for items */
+      text-align: center;
+      flex-shrink: 0; /* Prevent items from shrinking */
+    }
+
+    .action-item:hover, .unlock-button:hover {
+      background-color: rgba(255, 255, 255, 0.15);
+      transform: translateY(-2px);
+    }
+
+    .action-item svg, .unlock-button svg {
+      width: 20px; /* Adjusted size */
+      height: 20px; /* Adjusted size */
+      margin-bottom: 4px;
+      fill: currentColor;
+    }
+
+    .action-item span, .unlock-button span {
+      font-size: 0.65rem; /* Adjusted size */
+      line-height: 1.1;
+      max-width: 60px;
+      word-break: break-word;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap; /* Can be changed if multi-line preferred */
+    }
+    
+    .locked-actions-section-trigger {
+      margin-left: 10px; /* Space before the lock button */
+      border-left: 1px solid rgba(255,255,255,0.1);
+      padding-left: 10px;
+    }
+
+
+    /* ─── PIN Modal ─── */
+    .pin-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+    }
+
+    .pin-modal.visible {
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 0.3s ease, visibility 0s linear 0s;
+    }
+
+    .pin-modal-content {
+      background: rgba(25, 25, 35, 0.85);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding: 25px;
+      border-radius: 15px;
+      border: 1px solid rgba(255,255,255,0.15);
+      text-align: center;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+      width: 90%;
+      max-width: 300px;
+    }
+
+    .pin-modal-content h3 {
+      margin-bottom: 20px;
+      font-size: 1.3rem;
+      color: #EEE;
+    }
+
+    #pinInput {
+      width: 100%;
+      padding: 12px;
+      font-size: 1.6rem;
+      text-align: center;
+      letter-spacing: 0.3em; /* Spacing between digits */
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 8px;
+      color: #FFF;
+      margin-bottom: 20px;
+      box-sizing: border-box;
+      font-family: monospace;
+    }
+    #pinInput::placeholder {
+      color: #777;
+      letter-spacing: normal;
+    }
+
+    .pin-buttons {
+      display: flex;
+      justify-content: space-between; /* Spread buttons */
+    }
+
+    .pin-buttons button {
+      padding: 10px 0; /* Vertical padding, horizontal from flex width */
+      flex-grow: 1; /* Make buttons take available space */
+      margin: 0 5px; /* Small margin between buttons */
+      font-size: 0.9rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.2s, opacity 0.2s;
+      background-color: rgba(255,255,255,0.1);
+      color: #EEE;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .pin-buttons button#pinSubmitButton {
+      background: linear-gradient(45deg, #66a2de, #9d50bb);
+      color: #FFF;
+      border: none;
+    }
+    .pin-buttons button#pinSubmitButton:hover {
+      opacity: 0.85;
+    }
+    .pin-buttons button:not(#pinSubmitButton):hover {
+      background-color: rgba(255,255,255,0.2);
+    }
+
+    #pinErrorMessage {
+      color: #ff7b7b;
+      margin-top: 15px;
+      font-size: 0.85rem;
+      min-height: 1.2em; /* Reserve space */
     }
 
     /* Mobile-specific adjustments */
@@ -242,6 +448,7 @@
       .container {
         padding: 1.2rem;
         gap: 1.2rem;
+        margin-bottom: 90px; /* More space for taller shelf on mobile */
       }
       .brand {
         font-size: 2rem;
@@ -256,13 +463,43 @@
       .search-form input {
         padding: 10px 14px;
       }
-      .planet-1 {
-        width: 60px; height: 60px;
+      .planet-1 { width: 60px; height: 60px; }
+      .planet-2 { width: 30px; height: 30px; }
+
+      .quick-actions-shelf {
+        height: 70px; /* Slightly smaller shelf height for mobile */
       }
-      .planet-2 {
-        width: 30px; height: 30px;
+      .action-item, .unlock-button {
+        min-width: 60px;
+        height: 50px;
+        padding: 5px;
+      }
+      .action-item svg, .unlock-button svg {
+        width: 18px;
+        height: 18px;
+      }
+      .action-item span, .unlock-button span {
+        font-size: 0.6rem;
+      }
+      .quick-actions-content-wrapper {
+        gap: 8px;
+      }
+      .actions-container, .locked-actions-container {
+        gap: 8px;
+      }
+      .pin-modal-content {
+        padding: 20px;
+      }
+      #pinInput {
+        font-size: 1.4rem;
+        padding: 10px;
       }
     }
+
+    .icon-white {
+        filter: brightness(0) invert(1);
+    }
+
   </style>
 </head>
 <body>
@@ -284,7 +521,6 @@
   <div class="container">
     <div class="brand">HORIZON</div>
 
-    <!-- Current Time Display -->
     <div class="time-display">
       <div class="time-segment">
         <div class="value" id="hours">--</div>
@@ -304,42 +540,83 @@
       <input type="text" id="input" placeholder="Navigate the cosmos..." autocomplete="off" />
       <button type="submit" aria-label="Launch">
         <svg id="Space Rocket Flying" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-    <rect width="24" height="24" fill="none" opacity="0"/>
-    <g transform="matrix(0.83 0 0 0.83 12 12)">
-      <g>
-        <g style="" >
-<g transform="matrix(1 0 0 1 1.33 6.28)" >
-<path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform=" translate(-13.33, -18.28)" d="M 11 19 C 10.809407569368096 19.199195942164113 10.566965771497662 19.34119756663108 10.3 19.41 C 10.196215886072133 19.441540638043417 10.121382906191085 19.53212792947837 10.110000000000001 19.64 L 9.9 21.7 C 9.84354195120435 22.165805492822482 10.088770006767419 22.616144836710884 10.510680178953338 22.821459412480504 C 10.932590351139257 23.02677398825012 11.438289670833246 22.941859195957402 11.77 22.61 L 14.629999999999999 19.75 C 15.370158973279754 18.994311229092705 15.960555399419269 18.105323506974585 16.369999999999997 17.13 C 16.630488733113996 16.076525273126617 16.76145657716813 14.995201022218115 16.759999999999998 13.910000000000002 C 16.764146254892523 13.801420153620313 16.7003335359354 13.701712780249808 16.599999999999998 13.659999999999998 C 16.498874786427617 13.616170344957652 16.381443962554734 13.635742148936465 16.299999999999997 13.709999999999999 Z" stroke-linecap="round" />
-</g>
-<g transform="matrix(1 0 0 1 -6.28 -1.34)" >
-<path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform=" translate(-5.72, -10.66)" d="M 5 13 C 5 13 7.52 10.46 10.3 7.68 C 10.375032259031814 7.602973627312725 10.394906091559642 7.487705398651318 10.350000000000001 7.39 C 10.31076887509188 7.287615318555161 10.209402985524369 7.222741149231954 10.100000000000001 7.2299999999999995 C 8.988857181901203 7.214883263604519 7.880205204275035 7.339186667156547 6.799999999999996 7.600000000000004 C 5.842195225015241 8.0179680514796 4.973231826906527 8.61538038767934 4.239999999999997 9.360000000000003 L 1.39 12.21 C 1.0735498914513792 12.524669604705378 0.9785772990465238 12.999348903303728 1.1495969812555393 13.411550188628022 C 1.3206166634645549 13.823751473952315 1.7237327328634746 14.091776966057608 2.17 14.09 L 4.41 13.82 C 4.512543893185512 13.808946139843021 4.598859306740087 13.738324437843824 4.63 13.64 C 4.700988242225715 13.400409460145466 4.827792157328171 13.181072958346624 5 13 Z" stroke-linecap="round" />
-</g>
-<g transform="matrix(1 0 0 1 -8.19 8.11)" >
-<path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform=" translate(-3.81, -20.11)" d="M 5.62 16.85 C 4.72 15.950000000000001 3.35 16.1 2.21 17.23 C 1.41 18 0.59 20.62 0 22.65 C -0.08614590176304039 23.00756239755743 0.015596458005847191 23.384385952257013 0.27000000000000013 23.65 C 0.5374511525251731 23.90112924968888 0.9124981281218356 24.002391933099975 1.27 23.919999999999998 C 3.27 23.36 5.869999999999999 22.529999999999998 6.67 21.729999999999997 C 7.81 20.599999999999998 7.96 19.229999999999997 7.05 18.33 Z" stroke-linecap="round" />
-</g>
-<g transform="matrix(1 0 0 1 3.14 -3.13)" >
-<path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform=" translate(-15.14, -8.87)" d="M 23.36 0 C 22.03 0.27 19.36 0.9 18.509999999999998 1.73 L 6.35 13.93 C 6.250892850682708 14.037280692234166 6.250892850682708 14.202719307765834 6.35 14.31 L 9.709999999999999 17.66 C 9.757381117769473 17.71212855945152 9.824556000741188 17.741848282792 9.895 17.741848282792 C 9.96544399925881 17.741848282792 10.032618882230524 17.71212855945152 10.079999999999998 17.66 L 22.26 5.49 C 23.09 4.65 23.72 2 24 0.63 C 24.03223243144137 0.4580762635341492 23.975867548231935 0.2814662961445847 23.85 0.1600000000000001 C 23.725348904765596 0.02548294501529283 23.540014806734593 -0.035034311484625685 23.36 0 Z" stroke-linecap="round" />
-</g>
-      </g>
-    </g>
-  </svg>
+          <rect width="24" height="24" fill="none" opacity="0"/>
+          <g transform="matrix(0.83 0 0 0.83 12 12)">
+            <g><g><g transform="matrix(1 0 0 1 1.33 6.28)" ><path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform=" translate(-13.33, -18.28)" d="M 11 19 C 10.809407569368096 19.199195942164113 10.566965771497662 19.34119756663108 10.3 19.41 C 10.196215886072133 19.441540638043417 10.121382906191085 19.53212792947837 10.110000000000001 19.64 L 9.9 21.7 C 9.84354195120435 22.165805492822482 10.088770006767419 22.616144836710884 10.510680178953338 22.821459412480504 C 10.932590351139257 23.02677398825012 11.438289670833246 22.941859195957402 11.77 22.61 L 14.629999999999999 19.75 C 15.370158973279754 18.994311229092705 15.960555399419269 18.105323506974585 16.369999999999997 17.13 C 16.630488733113996 16.076525273126617 16.76145657716813 14.995201022218115 16.759999999999998 13.910000000000002 C 16.764146254892523 13.801420153620313 16.7003335359354 13.701712780249808 16.599999999999998 13.659999999999998 C 16.498874786427617 13.616170344957652 16.381443962554734 13.635742148936465 16.299999999999997 13.709999999999999 Z" stroke-linecap="round" /></g><g transform="matrix(1 0 0 1 -6.28 -1.34)" ><path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform=" translate(-5.72, -10.66)" d="M 5 13 C 5 13 7.52 10.46 10.3 7.68 C 10.375032259031814 7.602973627312725 10.394906091559642 7.487705398651318 10.350000000000001 7.39 C 10.31076887509188 7.287615318555161 10.209402985524369 7.222741149231954 10.100000000000001 7.2299999999999995 C 8.988857181901203 7.214883263604519 7.880205204275035 7.339186667156547 6.799999999999996 7.600000000000004 C 5.842195225015241 8.0179680514796 4.973231826906527 8.61538038767934 4.239999999999997 9.360000000000003 L 1.39 12.21 C 1.0735498914513792 12.524669604705378 0.9785772990465238 12.999348903303728 1.1495969812555393 13.411550188628022 C 1.3206166634645549 13.823751473952315 1.7237327328634746 14.091776966057608 2.17 14.09 L 4.41 13.82 C 4.512543893185512 13.808946139843021 4.598859306740087 13.738324437843824 4.63 13.64 C 4.700988242225715 13.400409460145466 4.827792157328171 13.181072958346624 5 13 Z" stroke-linecap="round" /></g><g transform="matrix(1 0 0 1 -8.19 8.11)" ><path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform=" translate(-3.81, -20.11)" d="M 5.62 16.85 C 4.72 15.950000000000001 3.35 16.1 2.21 17.23 C 1.41 18 0.59 20.62 0 22.65 C -0.08614590176304039 23.00756239755743 0.015596458005847191 23.384385952257013 0.27000000000000013 23.65 C 0.5374511525251731 23.90112924968888 0.9124981281218356 24.002391933099975 1.27 23.919999999999998 C 3.27 23.36 5.869999999999999 22.529999999999998 6.67 21.729999999999997 C 7.81 20.599999999999998 7.96 19.229999999999997 7.05 18.33 Z" stroke-linecap="round" /></g><g transform="matrix(1 0 0 1 3.14 -3.13)" ><path style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" transform=" translate(-15.14, -8.87)" d="M 23.36 0 C 22.03 0.27 19.36 0.9 18.509999999999998 1.73 L 6.35 13.93 C 6.250892850682708 14.037280692234166 6.250892850682708 14.202719307765834 6.35 14.31 L 9.709999999999999 17.66 C 9.757381117769473 17.71212855945152 9.824556000741188 17.741848282792 9.895 17.741848282792 C 9.96544399925881 17.741848282792 10.032618882230524 17.71212855945152 10.079999999999998 17.66 L 22.26 5.49 C 23.09 4.65 23.72 2 24 0.63 C 24.03223243144137 0.4580762635341492 23.975867548231935 0.2814662961445847 23.85 0.1600000000000001 C 23.725348904765596 0.02548294501529283 23.540014806734593 -0.035034311484625685 23.36 0 Z" stroke-linecap="round" /></g></g></g>
+        </svg>
       </button>
     </form>
   </div>
 
+  <!-- Quick Actions Shelf -->
+  <div class="quick-actions-shelf" id="quickActionsShelf">
+    <div class="quick-actions-content-wrapper">
+        <div class="actions-container" id="actionsContainer">
+            <!-- SNIPPET: Add REGULAR quick actions here. See guide in JS or HTML comment at end of body. -->
+            <!-- Example Regular Action 1: Google -->
+            <a href="https://google.com" class="action-item" target="_blank" title="Google Search">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                </svg>
+                <span>Google</span>
+            </a>
+            <!-- Example Regular Action 2: YouTube -->
+            <a href="https://youtube.com" class="action-item" target="_blank" title="YouTube">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M21.58 7.19c-.23-.86-.91-1.54-1.77-1.77C18.25 5 12 5 12 5s-6.25 0-7.81.42c-.86.23-1.54.91-1.77 1.77C2 8.75 2 12 2 12s0 3.25.42 4.81c.23.86.91 1.54 1.77 1.77C5.75 19 12 19 12 19s6.25 0 7.81-.42c.86-.23 1.54-.91 1.77-1.77C22 15.25 22 12 22 12s0-3.25-.42-4.81zM9.75 15.02V8.98L15.5 12l-5.75 3.02z"/>
+                </svg>
+                <span>YouTube</span>
+            </a>
+        </div>
+        
+        <div class="locked-actions-container" id="lockedActionsContainer" style="display: none;">
+            <!-- SNIPPET: Add LOCKED quick actions here. See guide in JS or HTML comment at end of body. -->
+            <!-- Example Locked Action: Private Notes -->
+            <a href="https://xvideos.com" class="action-item" target="_blank" title="Xvideos">
+                <img src="images/altvids.png" alt="Launch" width="24" height="24" />
+                <span>XVideos</span>
+            </a>
+            <a href="https://janitorai.com" class="action-item" target="_blank" title="JanitorAI">
+                <img src="images/janitor.png" alt="Launch" width="24" height="24" />
+                <span>JanitorAI</span>
+            </a>
+        </div>
+
+        <div class="locked-actions-section-trigger">
+            <button class="unlock-button" id="unlockButton" title="Unlock Actions">
+                <svg id="lockIconSvg" viewBox="0 0 24 24" fill="currentColor">
+                    <!-- Path will be set by JS -->
+                    <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+                </svg>
+                
+                <span id="unlockButtonText">Locked</span>
+            </button>
+        </div>
+    </div>
+  </div>
+
+  <!-- PIN Modal -->
+  <div class="pin-modal" id="pinModal">
+    <div class="pin-modal-content">
+        <h3>Enter PIN to Unlock</h3>
+        <input type="password" id="pinInput" maxlength="4" inputmode="numeric" pattern="\d*" placeholder="••••">
+        <p id="pinErrorMessage" style="display: none;"></p>
+        <div class="pin-buttons">
+            <button id="pinCancelButton">Cancel</button>
+            <button id="pinSubmitButton">Unlock</button>
+        </div>
+    </div>
+  </div>
+
+  
 
   <script>
     // ─── Current Time Display ───
     function updateTimeDisplay() {
       const now = new Date();
-      
-      const hours = now.getHours().toString().padStart(2, '0');
-      const minutes = now.getMinutes().toString().padStart(2, '0');
-      const seconds = now.getSeconds().toString().padStart(2, '0');
-      
-      document.getElementById('hours').textContent = hours;
-      document.getElementById('minutes').textContent = minutes;
-      document.getElementById('seconds').textContent = seconds;
+      document.getElementById('hours').textContent = now.getHours().toString().padStart(2, '0');
+      document.getElementById('minutes').textContent = now.getMinutes().toString().padStart(2, '0');
+      document.getElementById('seconds').textContent = now.getSeconds().toString().padStart(2, '0');
     }
     
     // ─── Smart Search/URL Redirect ───
@@ -347,8 +624,7 @@
       e.preventDefault();
       const v = document.getElementById('input').value.trim();
       if (!v) return;
-      // URL detection
-      const urlRe = /^(https?:\/\/)?([\w-]+\.)+[a-z]{2,}(\/.*)?$/i;
+      const urlRe = /^(https?:\/\/)?([\w.-]+)+\.[a-z]{2,}(\S*)?$/i;
       if (urlRe.test(v)) {
         let u = v;
         if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
@@ -370,11 +646,173 @@
     
     // Adjust some elements for mobile
     if (isMobileDevice()) {
-      // Any additional mobile-specific JS adjustments can go here
       document.querySelectorAll('.nebula').forEach(nebula => {
         nebula.style.filter = 'blur(100px)';
       });
     }
+
+    // ─── Quick Actions Shelf & PIN Lock ───
+
+    // IMPORTANT: Generate your PIN hash using the 'pin_hash_generator.html' tool
+    // and replace the placeholder string below with your generated hash.
+    const CORRECT_PIN_HASH = "20073d61961071df365b6987cf3f8a4cb886970035a567b9a9ef0066c4e125b2"; // e.g., "03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4" for "1234"
+
+    let isLockedSectionUnlocked = false;
+
+    const quickActionsShelf = document.getElementById('quickActionsShelf');
+    const lockedActionsContainer = document.getElementById('lockedActionsContainer');
+    const unlockButton = document.getElementById('unlockButton');
+    const unlockButtonText = document.getElementById('unlockButtonText');
+    const lockIconSvgPath = document.getElementById('lockIconSvg').querySelector('path'); // Corrected to get path element
+    
+    const pinModal = document.getElementById('pinModal');
+    const pinInput = document.getElementById('pinInput');
+    const pinSubmitButton = document.getElementById('pinSubmitButton');
+    const pinCancelButton = document.getElementById('pinCancelButton');
+    const pinErrorMessage = document.getElementById('pinErrorMessage');
+    const pinModalContent = document.querySelector('.pin-modal-content');
+
+
+    const lockedIconPath = "M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z";
+    const unlockedIconPath = "M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6h1.9c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm0 10H6V10h12v8z";
+
+    async function generateSHA256Hash(string) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(string);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer)); // convert buffer to byte array
+        const hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join(''); // convert bytes to hex string
+        return hashHex;
+    }
+
+    function updateLockVisuals() {
+        if (isLockedSectionUnlocked) {
+            lockedActionsContainer.style.display = 'flex';
+            quickActionsShelf.classList.add('locked-open');
+            unlockButtonText.textContent = 'Lock';
+            if (lockIconSvgPath) lockIconSvgPath.setAttribute('d', unlockedIconPath);
+            unlockButton.title = "Lock Actions";
+        } else {
+            lockedActionsContainer.style.display = 'none';
+            quickActionsShelf.classList.remove('locked-open');
+            unlockButtonText.textContent = 'Locked';
+            if (lockIconSvgPath) lockIconSvgPath.setAttribute('d', lockedIconPath);
+            unlockButton.title = "Unlock Actions";
+        }
+    }
+
+    async function handlePinSubmission() {
+        const enteredPin = pinInput.value;
+        if (!enteredPin) {
+            pinErrorMessage.textContent = 'Please enter a PIN.';
+            pinErrorMessage.style.display = 'block';
+            pinInput.focus();
+            return;
+        }
+        if (!/^\d{4}$/.test(enteredPin)) {
+             pinErrorMessage.textContent = 'PIN must be 4 digits.';
+            pinErrorMessage.style.display = 'block';
+            pinInput.value = '';
+            pinInput.focus();
+            return;
+        }
+
+        if (CORRECT_PIN_HASH === "YOUR_GENERATED_SHA256_HASH_HERE") {
+            pinErrorMessage.textContent = 'Developer: Please set CORRECT_PIN_HASH in the script.';
+            pinErrorMessage.style.display = 'block';
+            console.warn("CORRECT_PIN_HASH has not been set by the developer.");
+            return;
+        }
+        if (!crypto.subtle && (window.location.protocol !== "https:" && window.location.hostname !== "localhost" && !window.location.protocol.includes("-extension"))) {
+            pinErrorMessage.textContent = 'Hashing requires a secure context (HTTPS/localhost).';
+            pinErrorMessage.style.display = 'block';
+            console.warn("crypto.subtle not available. Ensure secure context for hashing.");
+            return;
+        }
+
+
+        try {
+            const enteredPinHash = await generateSHA256Hash(enteredPin);
+            
+            if (enteredPinHash === CORRECT_PIN_HASH) {
+                isLockedSectionUnlocked = true;
+                pinModal.classList.remove('visible');
+                updateLockVisuals();
+                pinErrorMessage.style.display = 'none';
+                pinErrorMessage.textContent = '';
+                pinInput.value = ''; // Clear PIN input on success
+            } else {
+                pinErrorMessage.textContent = 'Incorrect PIN. Please try again.';
+                pinErrorMessage.style.display = 'block';
+                pinInput.value = '';
+                pinInput.focus();
+                pinModalContent.classList.add('shake-error');
+                setTimeout(() => pinModalContent.classList.remove('shake-error'), 500);
+            }
+        } catch (error) {
+            console.error("Error processing PIN:", error);
+            pinErrorMessage.textContent = 'Error processing PIN. Ensure secure context (HTTPS/localhost) or check console.';
+            pinErrorMessage.style.display = 'block';
+        }
+    }
+
+    unlockButton.addEventListener('click', () => {
+        if (isLockedSectionUnlocked) {
+            isLockedSectionUnlocked = false;
+            updateLockVisuals();
+        } else {
+            pinModal.classList.add('visible');
+            pinInput.value = '';
+            pinInput.focus();
+            pinErrorMessage.style.display = 'none';
+            pinErrorMessage.textContent = '';
+        }
+    });
+
+    pinSubmitButton.addEventListener('click', handlePinSubmission);
+    
+    pinCancelButton.addEventListener('click', () => {
+        pinModal.classList.remove('visible');
+        pinInput.value = ''; // Clear PIN input on cancel
+        pinErrorMessage.style.display = 'none';
+        pinErrorMessage.textContent = '';
+    });
+
+    pinModal.addEventListener('click', (event) => {
+        if (event.target === pinModal) { // Click on backdrop
+            pinModal.classList.remove('visible');
+            pinInput.value = '';
+            pinErrorMessage.style.display = 'none';
+            pinErrorMessage.textContent = '';
+        }
+    });
+    
+    pinInput.addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault(); // Prevent form submission if it were in a form
+            handlePinSubmission();
+        }
+    });
+
+    // Add CSS for shake animation dynamically (if not already present)
+    if (!document.getElementById('pin-shake-style')) {
+        const styleSheet = document.createElement("style");
+        styleSheet.id = "pin-shake-style";
+        styleSheet.type = "text/css";
+        styleSheet.innerText = `
+            .pin-modal-content.shake-error {
+                animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+            }
+            @keyframes shake {
+                10%, 90% { transform: translate3d(-1px, 0, 0); }
+                20%, 80% { transform: translate3d(2px, 0, 0); }
+                30%, 50%, 70% { transform: translate3d(-3px, 0, 0); }
+                40%, 60% { transform: translate3d(3px, 0, 0); }
+            }`;
+        document.head.appendChild(styleSheet);
+    }
+    // Initial setup
+    updateLockVisuals();
   </script>
 </body>
 </html>
