@@ -3,18 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <title>Space Horizon • New Tab</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- MODIFIED LINE: Added viewport-fit=cover -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <link rel="icon" href="images/favicon.png" type="image/png">
   <style>
     /* ─── Reset & Base ─── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body {
-      width: 100%; height: 100%;
-      background: #000;
-      color: #EEE;
-      font-family: "Segoe UI", Roboto, sans-serif;
-      overflow: hidden; /* Keep this if main content isn't meant to scroll */
-      display: flex; align-items: center; justify-content: center;
+        width: 100%;
+        height: 100%;
+        background: #000;
+        color: #EEE;
+        font-family: "Segoe UI", Roboto, sans-serif;
+        overflow: hidden; /* Crucial: Prevent the body itself from scrolling */
+        /* REMOVE: display: flex; align-items: center; justify-content: center; */
     }
     /* Add padding to body if shelf might overlap scrollable content at the bottom,
        but for this centered, non-scrolling layout, it might not be needed unless content changes.
@@ -145,23 +147,34 @@
       0% { transform: rotate(0deg) translateX(30px) rotate(0deg); }
       100% { transform: rotate(360deg) translateX(30px) rotate(-360deg); }
     }
-
+    .page-wrapper {
+        display: flex;
+        align-items: center;    /* Vertically center .container */
+        justify-content: center; /* Horizontally center .container */
+        width: 100%;
+        height: 100%;
+        position: relative;
+        box-sizing: border-box;
+        /* This padding makes space at the bottom FOR the fixed shelf */
+        /* It should be the shelf's content height + safe area inset */
+        padding-bottom: calc(75px + env(safe-area-inset-bottom));
+    }
     /* ─── Layout ─── */
     .container {
-      position: relative;
-      z-index: 5;
-      width: 90%;
-      max-width: 500px;
-      padding: 1.5rem;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-      background: rgba(0,0,0,0.2);
-      backdrop-filter: blur(5px);
-      border-radius: 20px;
-      border: 1px solid rgba(255,255,255,0.1);
-      margin-bottom: 100px; /* Ensure space for the shelf below */
+        position: relative;
+        z-index: 5;
+        width: 90%;
+        max-width: 500px;
+        padding: 1.5rem;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        background: rgba(0,0,0,0.2);
+        backdrop-filter: blur(5px);
+        border-radius: 20px;
+        border: 1px solid rgba(255,255,255,0.1);
+        /* REMOVE: margin-bottom related to shelf height. Centering is now done by page-wrapper */
     }
 
     /* ─── Branding ─── */
@@ -248,21 +261,26 @@
 
     /* ─── Quick Actions Shelf ─── */
     .quick-actions-shelf {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      padding: 10px 0;
-      background: rgba(10, 10, 20, 0.6); /* Darker, slightly transparent */
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      z-index: 10;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      box-shadow: 0 -5px 15px rgba(0,0,0,0.3);
-      height: 75px; /* Fixed height for the shelf */
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(10, 10, 20, 0.6);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        z-index: 10;
+        display: flex;
+        justify-content: center; /* Centers .quick-actions-content-wrapper */
+        align-items: stretch;   /* Allows .quick-actions-content-wrapper to define its own padding if needed */
+        box-shadow: 0 -5px 15px rgba(0,0,0,0.3);
+        
+        /* This is the height of the SHELF'S CONTENT area */
+        height: 75px; 
+        /* This padding is INSIDE the shelf, pushing its content up from the physical bottom edge */
+        padding-bottom: env(safe-area-inset-bottom); 
+        /* Ensures height is for content, and padding_bottom adds to total visual height */
+        box-sizing: content-box; 
     }
 
     .quick-actions-content-wrapper {
@@ -445,11 +463,15 @@
 
     /* Mobile-specific adjustments */
     @media (max-width: 480px) {
-      .container {
-        padding: 1.2rem;
-        gap: 1.2rem;
-        margin-bottom: 90px; /* More space for taller shelf on mobile */
-      }
+        .page-wrapper {
+            /* Adjust padding to match mobile shelf height + safe area */
+            padding-bottom: calc(70px + env(safe-area-inset-bottom));
+        }   
+        .container {
+            padding: 1.2rem;
+            gap: 1.2rem;
+        }
+
       .brand {
         font-size: 2rem;
       }
@@ -467,8 +489,9 @@
       .planet-2 { width: 30px; height: 30px; }
 
       .quick-actions-shelf {
-        height: 70px; /* Slightly smaller shelf height for mobile */
-      }
+            height: 70px; /* Height of the shelf's content area for mobile, ABOVE the safe area padding */
+            /* padding-bottom: env(safe-area-inset-bottom); is inherited from the general rule */
+        }
       .action-item, .unlock-button {
         min-width: 60px;
         height: 50px;
@@ -518,6 +541,7 @@
   <div class="nebula nebula-2"></div>
   <div class="nebula nebula-3"></div>
 
+  <div class="page-wrapper">
   <div class="container">
     <div class="brand">HORIZON</div>
 
@@ -546,6 +570,7 @@
         </svg>
       </button>
     </form>
+  </div>
   </div>
 
   <!-- Quick Actions Shelf -->
