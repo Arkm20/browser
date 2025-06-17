@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="icon" href="images/favicon.png" type="image/png">
+<title>Glassy Launchpad</title>
+  <style>
+    :root {
+      --bg: #121212;
+      --glass: rgba(255,255,255,0.05);
+      --accent: #66a2de;
+      --text: #e0e0e0;
+      --blur: 10px;
+    }
+    * { box-sizing: border-box; margin:0; padding:0; }
+    body, html {
+      height:100%; width:100%;
+      background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+      font-family:sans-serif; color:var(--text);
+      overflow:hidden;
+    }
+    .glass {
+      background: var(--glass);
+      backdrop-filter: blur(var(--blur));
+      border:1px solid rgba(255,255,255,0.1);
+      border-radius:12px;
+    }
+    /* LOCK SCREEN */
+    #lock-screen {
+      position:fixed; top:0; left:0; right:0; bottom:0;
+      display:flex; align-items:center; justify-content:center;
+    }
+    #pin-input {
+      display:flex; gap:12px;
+    }
+    #pin-input input {
+      width:3rem; height:3rem;
+      font-size:1.5rem; text-align:center;
+      background:var(--glass); border:none; outline:none;
+      border-radius:6px;
+      color:var(--text);
+      backdrop-filter: blur(var(--blur));
+    }
+    /* DASHBOARD */
+    #dashboard {
+      display:none; flex-direction:column; height:100%; padding:1rem;
+    }
+    header {
+      display:flex; justify-content:space-between; align-items:center;
+      margin-bottom:1rem;
+    }
+    header .views button, header button#add-site {
+      background:none; border:1px solid var(--accent); color:var(--accent);
+      padding:0.5rem 1rem; margin-left:0.5rem; border-radius:6px;
+      cursor:pointer;
+    }
+    main {
+      flex:1; overflow:auto; position:relative;
+    }
+    /* GRID VIEW */
+    #sites.grid {
+      display:grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px,1fr));
+      gap:1rem;
+    }
+    #sites.grid .card {
+      padding:1rem; text-align:center;
+    }
+    /* LIST VIEW */
+    #sites.list .card {
+      display:flex; align-items:center; gap:1rem;
+      padding:0.75rem 1rem; border-bottom:1px solid rgba(255,255,255,0.1);
+    }
+    /* CAROUSEL */
+    #sites.carousel {
+      display:flex; overflow-x:auto; scroll-snap-type: x mandatory;
+      gap:1rem; padding-bottom:1rem;
+    }
+    #sites.carousel .card {
+      flex:0 0 200px; scroll-snap-align:center;
+      padding:1rem; text-align:center;
+    }
+    .card {
+      background:var(--glass); cursor:pointer;
+    }
+    .card:hover {
+      border:1px solid var(--accent);
+    }
+    .card img {
+      width:48px; height:48px; margin-bottom:0.5rem;
+    }
+    #iframe-container {
+      position:fixed; top:0; left:0; right:0; bottom:0;
+      display:none;
+    }
+    #iframe-container iframe {
+      width:100%; height:100%; border:none;
+    }
+    #iframe-container #close-iframe {
+      position:absolute; top:1rem; right:1rem;
+      background:var(--accent); border:none; padding:0.5rem;
+      border-radius:4px; cursor:pointer; color:#fff;
+      z-index:10;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LOCK SCREEN -->
+  <div id="lock-screen" class="glass">
+    <div>
+      <p style="text-align:center;margin-bottom:1rem;">Enter 4-digit PIN</p>
+      <div id="pin-input">
+        <input type="password" maxlength="1" inputmode="numeric">
+        <input type="password" maxlength="1" inputmode="numeric">
+        <input type="password" maxlength="1" inputmode="numeric">
+        <input type="password" maxlength="1" inputmode="numeric">
+      </div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dashboard">
+    <header>
+      <h1>Launchpad</h1>
+      <div>
+        <button id="add-site">+ Add</button>
+        <span class="views">
+          <button data-view="grid">Grid</button>
+          <button data-view="list">List</button>
+          <button data-view="carousel">Carousel</button>
+        </span>
+      </div>
+    </header>
+    <main>
+      <div id="sites" class="grid"></div>
+    </main>
+  </div>
+
+  <!-- IFRAME VIEWER -->
+  <div id="iframe-container">
+    <button id="close-iframe">✕</button>
+    <iframe src=""></iframe>
+  </div>
+
+  <script>
+    (() => {
+      const PIN_KEY = 'launchpad_pin';
+      const SITES_KEY = 'launchpad_sites';
+      const lockScreen = document.getElementById('lock-screen');
+      const inputs = [...document.querySelectorAll('#pin-input input')];
+      const dashboard = document.getElementById('dashboard');
+      const sitesContainer = document.getElementById('sites');
+      const addBtn = document.getElementById('add-site');
+      const viewBtns = document.querySelectorAll('button[data-view]');
+      const iframeContainer = document.getElementById('iframe-container');
+      const iframe = iframeContainer.querySelector('iframe');
+      const closeIframe = document.getElementById('close-iframe');
+
+      let sites = JSON.parse(localStorage.getItem(SITES_KEY) || '[]');
+      let view = 'grid';
+
+      function showDashboard() {
+        lockScreen.style.display = 'none';
+        dashboard.style.display = 'flex';
+        renderSites();
+      }
+
+      // PIN logic
+      const savedPin = localStorage.getItem(PIN_KEY);
+      if (savedPin) {
+        showDashboard();
+      } else {
+        inputs[0].focus();
+      }
+
+      inputs.forEach((inp, i) => {
+        inp.addEventListener('input', () => {
+          if (inp.value && i < inputs.length - 1) {
+            inputs[i+1].focus();
+          }
+          if (inputs.every(i => i.value)) {
+            const entered = inputs.map(i=>i.value).join('');
+            if (!savedPin) {
+              localStorage.setItem(PIN_KEY, entered);
+              showDashboard();
+            } else if (entered === savedPin) {
+              showDashboard();
+            } else {
+              inputs.forEach(i=>i.value='');
+              inputs[0].focus();
+            }
+          }
+        });
+      });
+
+      // Fetch favicon (via Google service)
+      function getIcon(url) {
+        try {
+          const d = new URL(url).hostname;
+          return `https://www.google.com/s2/favicons?domain=${d}`;
+        } catch {
+          return '';
+        }
+      }
+
+      // Render sites in current view
+      function renderSites() {
+        sitesContainer.innerHTML = '';
+        sitesContainer.className = view;
+        sites.forEach((site, idx) => {
+          const card = document.createElement('div');
+          card.className = 'card glass';
+          card.innerHTML = `
+            <img src="${getIcon(site.url)}" alt="">
+            <div>${site.name}</div>
+          `;
+          card.addEventListener('click', () => openSite(site.url));
+          sitesContainer.appendChild(card);
+        });
+      }
+
+      // Open in iframe
+      function openSite(url) {
+        iframe.src = url;
+        iframeContainer.style.display = 'block';
+      }
+      closeIframe.addEventListener('click', () => {
+        iframeContainer.style.display = 'none';
+        iframe.src = '';
+      });
+
+      // Add new site
+      addBtn.addEventListener('click', () => {
+        const name = prompt('Site name:');
+        const url = prompt('Site URL (include https://):');
+        if (name && url) {
+          sites.push({ name, url });
+          localStorage.setItem(SITES_KEY, JSON.stringify(sites));
+          renderSites();
+        }
+      });
+
+      // Toggle views
+      viewBtns.forEach(b => {
+        b.addEventListener('click', () => {
+          view = b.dataset.view;
+          renderSites();
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
