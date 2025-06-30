@@ -8,15 +8,15 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-color: #1a1b1e;
-            --surface-color: rgba(38, 39, 43, 0.7);
-            --text-primary: #f0f0f0;
-            --text-secondary: #a0a7b0;
-            --accent-color: #0e8dff;
-            --border-color: rgba(255, 255, 255, 0.1);
-            --item-width: 120px;
-            --item-height: 180px;
+                :root {
+            --bg-color: #0a0b0d; /* Darker, richer background */
+            --surface-glass: rgba(255, 255, 255, 0.05); /* Base for glass elements */
+            --text-primary: #f5f5f5;
+            --text-secondary: #b0b8c0;
+            --accent-color: #00aaff;
+            --border-glass: rgba(255, 255, 255, 0.15);
+            --item-width: 140px;  /* Slightly larger cards */
+            --item-height: 210px;
         }
 
         * {
@@ -33,7 +33,7 @@
             color: var(--text-primary);
         }
 
-        /* --- Username Modal --- */
+        /* --- Username Modal (Minor glass update) --- */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(10, 10, 10, 0.7);
@@ -43,8 +43,10 @@
         }
         .modal-overlay.visible { opacity: 1; visibility: visible; }
         .modal-content {
-            background: var(--surface-color); padding: 30px; border-radius: 16px;
-            border: 1px solid var(--border-color); text-align: center;
+            background: rgba(26, 27, 30, 0.7); /* Darker glass for modal */
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            padding: 30px; border-radius: 16px;
+            border: 1px solid var(--border-glass); text-align: center;
             width: 90%; max-width: 400px; transform: scale(0.95); transition: transform 0.3s ease;
         }
         .modal-overlay.visible .modal-content { transform: scale(1); }
@@ -52,16 +54,16 @@
         .modal-content p { margin-bottom: 25px; color: var(--text-secondary); }
         #username-input {
             width: 100%; padding: 12px 15px; background: rgba(0,0,0,0.3);
-            border: 1px solid var(--border-color); border-radius: 8px;
+            border: 1px solid var(--border-glass); border-radius: 8px;
             color: var(--text-primary); font-size: 1rem; margin-bottom: 20px;
         }
-        #username-input:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(14, 141, 255, 0.3); }
+        #username-input:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(0, 170, 255, 0.3); }
         #username-submit {
             width: 100%; padding: 12px; background: var(--accent-color);
             border: none; border-radius: 8px; color: white;
             font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.2s ease;
         }
-        #username-submit:hover { background: #0c7de3; }
+        #username-submit:hover { background: #0095e6; }
 
         /* --- Main Launcher Layout --- */
         .launcher-container {
@@ -71,104 +73,134 @@
             position: relative;
             background-size: cover;
             background-position: center;
-            transition: background-image 0.5s ease-in-out;
+            transition: background-image 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
         .background-overlay {
             position: absolute;
             inset: 0;
-            background: linear-gradient(180deg, rgba(26, 27, 30, 0.8) 0%, rgba(26, 27, 30, 0.5) 40%, rgba(26, 27, 30, 1) 85%);
+            background: linear-gradient(180deg, rgba(10, 11, 13, 0.7) 0%, rgba(10, 11, 13, 0.3) 50%, #0a0b0d 90%);
             z-index: 1;
         }
         
-        /* --- Header --- */
+        /* --- Glassy Header --- */
         .launcher-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 20px 10px 20px;
+            padding: 15px 20px;
             position: relative;
             z-index: 2;
+            background: var(--surface-glass);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-glass);
         }
-        .user-greeting #greeting { font-size: 1.1rem; font-weight: 600; }
-        .user-greeting #username-display { font-size: 0.9rem; color: var(--text-secondary); }
-        .system-info #clock { font-size: 1.1rem; font-weight: 600; }
+        .user-greeting #greeting { font-size: 1rem; font-weight: 600; }
+        .user-greeting #username-display { font-size: 0.8rem; color: var(--text-secondary); }
+        .system-info #clock { font-size: 1rem; font-weight: 600; }
 
-        /* --- Main Content (Carousel + Info) --- */
+        /* --- Main Content --- */
         .launcher-main {
             flex: 1;
             display: flex;
             flex-direction: column;
-            justify-content: center; /* Vertically center the content block */
+            justify-content: flex-end; /* Align content to the bottom */
             position: relative;
             z-index: 2;
-            padding: 0 0 20px 0;
+            padding: 20px 0;
             overflow: hidden;
+            gap: 20px; /* Space between carousel and info panel */
         }
 
         /* --- Horizontal Carousel --- */
         .carousel-container {
             width: 100%;
-            padding: 20px 0;
         }
         .carousel-track {
             display: flex;
             align-items: center;
-            padding-left: 20px; /* Start first item with some padding */
+            padding: 0 20px;
             transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
         .carousel-item {
             flex-shrink: 0;
+            position: relative; /* Needed for the text overlay */
             width: var(--item-width);
             height: var(--item-height);
             background-size: cover;
             background-position: center;
             border-radius: 12px;
-            margin-right: 15px;
+            margin: 0 10px;
             cursor: pointer;
             transform: scale(0.9);
-            opacity: 0.7;
+            opacity: 0.6;
             transition: transform 0.4s ease, opacity 0.4s ease;
-            border: 2px solid transparent;
-            background-color: #333; /* Added a fallback color */
+            border: 1px solid var(--border-glass);
+            overflow: hidden; /* Important for the overlay */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
         .carousel-item.active {
-            transform: scale(1.1); /* Make active item larger */
+            transform: scale(1.05); /* Make active item larger */
             opacity: 1;
             border-color: var(--accent-color);
-            box-shadow: 0 0 25px rgba(14, 141, 255, 0.4);
+            box-shadow: 0 0 25px -5px var(--accent-color), 0 8px 30px rgba(0,0,0,0.5);
+        }
+        
+        /* --- Card Name Overlay (The Magic!) --- */
+        .carousel-item::after {
+            content: attr(data-name); /* Pulls name from the data attribute */
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px 10px 10px 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-align: center;
+            color: var(--text-primary);
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+            text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+            transition: opacity 0.3s ease;
         }
 
-        /* --- Info Panel --- */
+        /* --- Glassy Info Panel --- */
         .info-panel {
-            padding: 30px 25px 0 25px;
-            text-align: left;
+            margin: 0 20px; /* Side margins */
+            padding: 20px;
+            background: var(--surface-glass);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: 16px;
         }
         #app-title {
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: 700;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
         }
         #app-description {
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             color: var(--text-secondary);
-            margin-bottom: 25px;
-            min-height: 40px; /* Reserve space to prevent layout jump */
+            margin-bottom: 20px;
+            min-height: 36px;
         }
         #launch-button {
-            display: inline-block;
+            display: block;
             width: 100%;
             text-align: center;
-            padding: 15px 30px;
+            padding: 14px 30px;
             background-color: var(--accent-color);
             color: white;
             text-decoration: none;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 600;
             border-radius: 10px;
-            transition: background-color 0.2s ease, transform 0.1s ease;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+        #launch-button:hover {
+            background-color: #0095e6;
         }
         #launch-button:active {
-             transform: scale(0.98);
+             transform: scale(0.97);
+             background-color: #0081cc;
         }
     </style>
 </head>
@@ -325,6 +357,7 @@
                     item.className = 'carousel-item';
                     item.style.backgroundImage = `url('${site.image}')`;
                     item.dataset.index = index;
+                    item.dataset.name = site.name; // <-- ADD THIS LINE
 
                     item.addEventListener('click', () => {
                         setActiveItem(index);
