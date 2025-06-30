@@ -33,7 +33,7 @@
             color: var(--text-primary);
         }
 
-        /* --- Username Modal (Same as before, good as is) --- */
+        /* --- Username Modal --- */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(10, 10, 10, 0.7);
@@ -129,6 +129,7 @@
             opacity: 0.7;
             transition: transform 0.4s ease, opacity 0.4s ease;
             border: 2px solid transparent;
+            background-color: #333; /* Added a fallback color */
         }
         .carousel-item.active {
             transform: scale(1.1); /* Make active item larger */
@@ -215,62 +216,57 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // =================================================================
-            // CUSTOMIZE YOUR SITES HERE
-            // =================================================================
-            // - name, url, description: Same as before.
-            // - image: URL to a PORTRAIT-oriented image for the cover art.
-            //   This image is used for both the carousel and the main background.
-            //   (Tip: Use unsplash.com, search for "mobile wallpaper" or add
-            //    `&orientation=portrait` to the URL. e.g.,
-            //    https://source.unsplash.com/400x600/?keyword)
-            // =================================================================
-          
 
-          const sites = [
-   {
-       name: 'JanitorAI',
-       url: 'https://janitorai.com',
-       description: 'AI-powered adult entertainment platform offering high-quality videos.',
-       image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQUwJTODqesLUuJL-1d1YzOrZbwRrCFQ6XPVSu_Yljt5AQcB7qoOwvWnKk&s=10’
-   },
-   {
-       name: 'Pornhub',
-       url: 'https://www.pornhub.com',
-       description: 'Popular streaming site featuring a vast collection of adult content.',
-       image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSyqt_VF1BW-gt6h0CLuCfojZs5RQACwtrgoZTKcxCIKLs3e9xjDVRz280&s=10'
-   },
-   {
-       name: 'RedTube',
-       url: 'https://www.redtube.com',
-       description: 'Well-known streaming platform specializing in adult movies.',
-       image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTky1K8crroTaCkirZCWpEyXRArksiep3G-iw&usqp=CAU’
-   },
-   {
-       name: 'XVideos',
-       url: 'https://www.xvideos.com',
-       description: 'One of the largest free adult video sharing sites on the internet.',
-       image: 'https://t.auntmia.com/nthumbs/2021-03-06/3174848/3174848_07.jpg'
-   },
-   {
-       name: 'YouPorn',
-       url: 'https://www.youporn.com',
-       description: 'A YouTube-like platform dedicated to adult content.',
-       image: 'https://t.auntmia.com/nthumbs/2021-12-14/4964964/4964964_09.jpg'
-   },
-   {
-       name: 'Nhentai',
-       url: 'https://nhentai.net/',
-       description: 'Community-driven platform for hentai manga.',
-       image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRma9W9XJaNBje7kDsxDzhw09gi2vRmHYOepncFhf5fd8De_2kbZVeZf8g&s=10'
-   },
-   {
-       name: 'Hentaifox',
-       url: 'http://hentaifox.com/',
-       description: 'Extensive library of hentai manga and comics.',
-       image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSaa0jBQzGyiR3hnOFmMWffdO6DB6xPRZ4BhQ&usqp=CAU'
-   }
-];
+            // =================================================================
+            // CORRECTED SITES LIST
+            // =================================================================
+            // NOTE: The image URLs from caches (like gstatic) might stop working.
+            // For best results, find more permanent image links.
+            // =================================================================
+            const sites = [
+                {
+                    name: 'JanitorAI',
+                    url: 'https://janitorai.com',
+                    description: 'AI-powered adult entertainment platform offering high-quality videos.',
+                    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQUwJTODqesLUuJL-1d1YzOrZbwRrCFQ6XPVSu_Yljt5AQcB7qoOwvWnKk&s=10'
+                },
+                {
+                    name: 'Pornhub',
+                    url: 'https://www.pornhub.com',
+                    description: 'Popular streaming site featuring a vast collection of adult content.',
+                    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSyqt_VF1BW-gt6h0CLuCfojZs5RQACwtrgoZTKcxCIKLs3e9xjDVRz280&s=10'
+                },
+                {
+                    name: 'RedTube',
+                    url: 'https://www.redtube.com',
+                    description: 'Well-known streaming platform specializing in adult movies.',
+                    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTky1K8crroTaCkirZCWpEyXRArksiep3G-iw&usqp=CAU'
+                },
+                {
+                    name: 'XVideos',
+                    url: 'https://www.xvideos.com',
+                    description: 'One of the largest free adult video sharing sites on the internet.',
+                    image: 'https://t.auntmia.com/nthumbs/2021-03-06/3174848/3174848_07.jpg'
+                },
+                {
+                    name: 'YouPorn',
+                    url: 'https://www.youporn.com',
+                    description: 'A YouTube-like platform dedicated to adult content.',
+                    image: 'https://t.auntmia.com/nthumbs/2021-12-14/4964964/4964964_09.jpg'
+                },
+                {
+                    name: 'Nhentai',
+                    url: 'https://nhentai.net/',
+                    description: 'Community-driven platform for hentai manga.',
+                    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRma9W9XJaNBje7kDsxDzhw09gi2vRmHYOepncFhf5fd8De_2kbZVeZf8g&s=10'
+                },
+                {
+                    name: 'Hentaifox',
+                    url: 'http://hentaifox.com/',
+                    description: 'Extensive library of hentai manga and comics.',
+                    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSaa0jBQzGyiR3hnOFmMWffdO6DB6xPRZ4BhQ&usqp=CAU'
+                }
+            ];
 
             // --- DOM Elements ---
             const modalOverlay = document.getElementById('modal-overlay');
@@ -290,6 +286,8 @@
             // --- Core Functions ---
             
             function setActiveItem(index) {
+                if (!sites[index]) return; // Exit if index is invalid
+                
                 currentIndex = index;
                 const site = sites[index];
 
@@ -307,19 +305,14 @@
                 // Move track to center the active item
                 const activeItem = document.querySelector('.carousel-item.active');
                 if (activeItem) {
-                    const trackPadding = parseInt(window.getComputedStyle(carouselTrack).paddingLeft);
+                    const trackPaddingLeft = parseInt(window.getComputedStyle(carouselTrack).paddingLeft) || 0;
                     const itemWidth = activeItem.offsetWidth;
-                    const itemMargin = parseInt(window.getComputedStyle(activeItem).marginRight);
-                    // We want the active item to be just off-center to the left, like SteamOS
-                    const screenCenter = window.innerWidth / 2;
-                    const itemCenter = activeItem.offsetLeft + (itemWidth / 2);
-                    const desiredOffset = screenCenter - (itemWidth * 1.1) ; // Pull left of center
                     
-                    let newTransform = itemCenter - desiredOffset;
+                    // We want the active item to be positioned about 1/4 from the left edge of the screen
+                    const desiredPosition = window.innerWidth / 4;
+                    const itemLeftEdge = activeItem.offsetLeft;
                     
-                    // Clamp the transform value so we don't have empty space at the start/end
-                    const maxTransform = carouselTrack.scrollWidth - window.innerWidth + trackPadding;
-                    newTransform = Math.max(0, Math.min(newTransform, maxTransform));
+                    let newTransform = itemLeftEdge - desiredPosition;
                     
                     carouselTrack.style.transform = `translateX(-${newTransform}px)`;
                 }
@@ -352,7 +345,7 @@
             
             function updateClock() {
                 const now = new Date();
-                clockEl.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+                clockEl.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
             }
 
             function initializeUser() {
@@ -380,7 +373,8 @@
             initializeUser();
             generateCarousel();
             if (sites.length > 0) {
-                setActiveItem(0); // Set the first item as active by default
+                // Use a short timeout to ensure layout is calculated before setting active item
+                setTimeout(() => setActiveItem(0), 100);
             }
             updateClock();
             setInterval(updateClock, 10000); // Update clock every 10 seconds
