@@ -1,255 +1,391 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <link rel="icon" href="images/favicon.png" type="image/png">
-<title>Glassy Launchpad</title>
-  <style>
-    :root {
-      --bg: #121212;
-      --glass: rgba(255,255,255,0.05);
-      --accent: #66a2de;
-      --text: #e0e0e0;
-      --blur: 10px;
-    }
-    * { box-sizing: border-box; margin:0; padding:0; }
-    body, html {
-      height:100%; width:100%;
-      background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
-      font-family:sans-serif; color:var(--text);
-      overflow:hidden;
-    }
-    .glass {
-      background: var(--glass);
-      backdrop-filter: blur(var(--blur));
-      border:1px solid rgba(255,255,255,0.1);
-      border-radius:12px;
-    }
-    /* LOCK SCREEN */
-    #lock-screen {
-      position:fixed; top:0; left:0; right:0; bottom:0;
-      display:flex; align-items:center; justify-content:center;
-    }
-    #pin-input {
-      display:flex; gap:12px;
-    }
-    #pin-input input {
-      width:3rem; height:3rem;
-      font-size:1.5rem; text-align:center;
-      background:var(--glass); border:none; outline:none;
-      border-radius:6px;
-      color:var(--text);
-      backdrop-filter: blur(var(--blur));
-    }
-    /* DASHBOARD */
-    #dashboard {
-      display:none; flex-direction:column; height:100%; padding:1rem;
-    }
-    header {
-      display:flex; justify-content:space-between; align-items:center;
-      margin-bottom:1rem;
-    }
-    header .views button, header button#add-site {
-      background:none; border:1px solid var(--accent); color:var(--accent);
-      padding:0.5rem 1rem; margin-left:0.5rem; border-radius:6px;
-      cursor:pointer;
-    }
-    main {
-      flex:1; overflow:auto; position:relative;
-    }
-    /* GRID VIEW */
-    #sites.grid {
-      display:grid;
-      grid-template-columns: repeat(auto-fill, minmax(140px,1fr));
-      gap:1rem;
-    }
-    #sites.grid .card {
-      padding:1rem; text-align:center;
-    }
-    /* LIST VIEW */
-    #sites.list .card {
-      display:flex; align-items:center; gap:1rem;
-      padding:0.75rem 1rem; border-bottom:1px solid rgba(255,255,255,0.1);
-    }
-    /* CAROUSEL */
-    #sites.carousel {
-      display:flex; overflow-x:auto; scroll-snap-type: x mandatory;
-      gap:1rem; padding-bottom:1rem;
-    }
-    #sites.carousel .card {
-      flex:0 0 200px; scroll-snap-align:center;
-      padding:1rem; text-align:center;
-    }
-    .card {
-      background:var(--glass); cursor:pointer;
-    }
-    .card:hover {
-      border:1px solid var(--accent);
-    }
-    .card img {
-      width:48px; height:48px; margin-bottom:0.5rem;
-    }
-    #iframe-container {
-      position:fixed; top:0; left:0; right:0; bottom:0;
-      display:none;
-    }
-    #iframe-container iframe {
-      width:100%; height:100%; border:none;
-    }
-    #iframe-container #close-iframe {
-      position:absolute; top:1rem; right:1rem;
-      background:var(--accent); border:none; padding:0.5rem;
-      border-radius:4px; cursor:pointer; color:#fff;
-      z-index:10;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Web Launcher</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #1a1b1e;
+            --surface-color: rgba(38, 39, 43, 0.7);
+            --text-primary: #f0f0f0;
+            --text-secondary: #a0a7b0;
+            --accent-color: #0e8dff;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --item-width: 120px;
+            --item-height: 180px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+        }
+
+        /* --- Username Modal (Same as before, good as is) --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(10, 10, 10, 0.7);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            z-index: 1000; display: flex; justify-content: center; align-items: center;
+            opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal-overlay.visible { opacity: 1; visibility: visible; }
+        .modal-content {
+            background: var(--surface-color); padding: 30px; border-radius: 16px;
+            border: 1px solid var(--border-color); text-align: center;
+            width: 90%; max-width: 400px; transform: scale(0.95); transition: transform 0.3s ease;
+        }
+        .modal-overlay.visible .modal-content { transform: scale(1); }
+        .modal-content h2 { margin-bottom: 10px; font-weight: 600; }
+        .modal-content p { margin-bottom: 25px; color: var(--text-secondary); }
+        #username-input {
+            width: 100%; padding: 12px 15px; background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-color); border-radius: 8px;
+            color: var(--text-primary); font-size: 1rem; margin-bottom: 20px;
+        }
+        #username-input:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(14, 141, 255, 0.3); }
+        #username-submit {
+            width: 100%; padding: 12px; background: var(--accent-color);
+            border: none; border-radius: 8px; color: white;
+            font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.2s ease;
+        }
+        #username-submit:hover { background: #0c7de3; }
+
+        /* --- Main Launcher Layout --- */
+        .launcher-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            transition: background-image 0.5s ease-in-out;
+        }
+        .background-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(26, 27, 30, 0.8) 0%, rgba(26, 27, 30, 0.5) 40%, rgba(26, 27, 30, 1) 85%);
+            z-index: 1;
+        }
+        
+        /* --- Header --- */
+        .launcher-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 20px 10px 20px;
+            position: relative;
+            z-index: 2;
+        }
+        .user-greeting #greeting { font-size: 1.1rem; font-weight: 600; }
+        .user-greeting #username-display { font-size: 0.9rem; color: var(--text-secondary); }
+        .system-info #clock { font-size: 1.1rem; font-weight: 600; }
+
+        /* --- Main Content (Carousel + Info) --- */
+        .launcher-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* Vertically center the content block */
+            position: relative;
+            z-index: 2;
+            padding: 0 0 20px 0;
+            overflow: hidden;
+        }
+
+        /* --- Horizontal Carousel --- */
+        .carousel-container {
+            width: 100%;
+            padding: 20px 0;
+        }
+        .carousel-track {
+            display: flex;
+            align-items: center;
+            padding-left: 20px; /* Start first item with some padding */
+            transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .carousel-item {
+            flex-shrink: 0;
+            width: var(--item-width);
+            height: var(--item-height);
+            background-size: cover;
+            background-position: center;
+            border-radius: 12px;
+            margin-right: 15px;
+            cursor: pointer;
+            transform: scale(0.9);
+            opacity: 0.7;
+            transition: transform 0.4s ease, opacity 0.4s ease;
+            border: 2px solid transparent;
+        }
+        .carousel-item.active {
+            transform: scale(1.1); /* Make active item larger */
+            opacity: 1;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 25px rgba(14, 141, 255, 0.4);
+        }
+
+        /* --- Info Panel --- */
+        .info-panel {
+            padding: 30px 25px 0 25px;
+            text-align: left;
+        }
+        #app-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        #app-description {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: 25px;
+            min-height: 40px; /* Reserve space to prevent layout jump */
+        }
+        #launch-button {
+            display: inline-block;
+            width: 100%;
+            text-align: center;
+            padding: 15px 30px;
+            background-color: var(--accent-color);
+            color: white;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 10px;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+        #launch-button:active {
+             transform: scale(0.98);
+        }
+    </style>
 </head>
 <body>
 
-  <!-- LOCK SCREEN -->
-  <div id="lock-screen" class="glass">
-    <div>
-      <p style="text-align:center;margin-bottom:1rem;">Enter 4-digit PIN</p>
-      <div id="pin-input">
-        <input type="password" maxlength="1" inputmode="numeric">
-        <input type="password" maxlength="1" inputmode="numeric">
-        <input type="password" maxlength="1" inputmode="numeric">
-        <input type="password" maxlength="1" inputmode="numeric">
-      </div>
+    <div id="modal-overlay" class="modal-overlay">
+        <!-- Modal content is the same as before -->
+        <div class="modal-content">
+            <h2>Welcome!</h2>
+            <p>Please enter your name to personalize your launcher.</p>
+            <form id="username-form">
+                <input type="text" id="username-input" placeholder="Your Name" required autocomplete="off">
+                <button type="submit" id="username-submit">Save Name</button>
+            </form>
+        </div>
     </div>
-  </div>
 
-  <!-- DASHBOARD -->
-  <div id="dashboard">
-    <header>
-      <h1>Launchpad</h1>
-      <div>
-        <button id="add-site">+ Add</button>
-        <span class="views">
-          <button data-view="grid">Grid</button>
-          <button data-view="list">List</button>
-          <button data-view="carousel">Carousel</button>
-        </span>
-      </div>
-    </header>
-    <main>
-      <div id="sites" class="grid"></div>
-    </main>
-  </div>
+    <div class="launcher-container" id="launcher-container">
+        <div class="background-overlay"></div>
+        
+        <header class="launcher-header">
+            <div class="user-greeting">
+                <div id="greeting"></div>
+                <div id="username-display"></div>
+            </div>
+            <div class="system-info">
+                <div id="clock"></div>
+            </div>
+        </header>
 
-  <!-- IFRAME VIEWER -->
-  <div id="iframe-container">
-    <button id="close-iframe">✕</button>
-    <iframe src=""></iframe>
-  </div>
+        <main class="launcher-main">
+            <div class="carousel-container">
+                <div class="carousel-track" id="carousel-track">
+                    <!-- Carousel items generated by JS -->
+                </div>
+            </div>
 
-  <script>
-    (() => {
-      const PIN_KEY = 'launchpad_pin';
-      const SITES_KEY = 'launchpad_sites';
-      const lockScreen = document.getElementById('lock-screen');
-      const inputs = [...document.querySelectorAll('#pin-input input')];
-      const dashboard = document.getElementById('dashboard');
-      const sitesContainer = document.getElementById('sites');
-      const addBtn = document.getElementById('add-site');
-      const viewBtns = document.querySelectorAll('button[data-view]');
-      const iframeContainer = document.getElementById('iframe-container');
-      const iframe = iframeContainer.querySelector('iframe');
-      const closeIframe = document.getElementById('close-iframe');
+            <div class="info-panel">
+                <h2 id="app-title"></h2>
+                <p id="app-description"></p>
+                <a href="#" id="launch-button" target="_blank">Launch</a>
+            </div>
+        </main>
+    </div>
 
-      let sites = JSON.parse(localStorage.getItem(SITES_KEY) || '[]');
-      let view = 'grid';
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // =================================================================
+            // CUSTOMIZE YOUR SITES HERE
+            // =================================================================
+            // - name, url, description: Same as before.
+            // - image: URL to a PORTRAIT-oriented image for the cover art.
+            //   This image is used for both the carousel and the main background.
+            //   (Tip: Use unsplash.com, search for "mobile wallpaper" or add
+            //    `&orientation=portrait` to the URL. e.g.,
+            //    https://source.unsplash.com/400x600/?keyword)
+            // =================================================================
+          
 
-      function showDashboard() {
-        lockScreen.style.display = 'none';
-        dashboard.style.display = 'flex';
-        renderSites();
-      }
+          const sites = [
+   {
+       name: 'JanitorAI',
+       url: 'https://janitorai.com',
+       description: 'AI-powered adult entertainment platform offering high-quality videos.',
+       image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQUwJTODqesLUuJL-1d1YzOrZbwRrCFQ6XPVSu_Yljt5AQcB7qoOwvWnKk&s=10’
+   },
+   {
+       name: 'Pornhub',
+       url: 'https://www.pornhub.com',
+       description: 'Popular streaming site featuring a vast collection of adult content.',
+       image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSyqt_VF1BW-gt6h0CLuCfojZs5RQACwtrgoZTKcxCIKLs3e9xjDVRz280&s=10'
+   },
+   {
+       name: 'RedTube',
+       url: 'https://www.redtube.com',
+       description: 'Well-known streaming platform specializing in adult movies.',
+       image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTky1K8crroTaCkirZCWpEyXRArksiep3G-iw&usqp=CAU’
+   },
+   {
+       name: 'XVideos',
+       url: 'https://www.xvideos.com',
+       description: 'One of the largest free adult video sharing sites on the internet.',
+       image: 'https://t.auntmia.com/nthumbs/2021-03-06/3174848/3174848_07.jpg'
+   },
+   {
+       name: 'YouPorn',
+       url: 'https://www.youporn.com',
+       description: 'A YouTube-like platform dedicated to adult content.',
+       image: 'https://t.auntmia.com/nthumbs/2021-12-14/4964964/4964964_09.jpg'
+   },
+   {
+       name: 'Nhentai',
+       url: 'https://nhentai.net/',
+       description: 'Community-driven platform for hentai manga.',
+       image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRma9W9XJaNBje7kDsxDzhw09gi2vRmHYOepncFhf5fd8De_2kbZVeZf8g&s=10'
+   },
+   {
+       name: 'Hentaifox',
+       url: 'http://hentaifox.com/',
+       description: 'Extensive library of hentai manga and comics.',
+       image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSaa0jBQzGyiR3hnOFmMWffdO6DB6xPRZ4BhQ&usqp=CAU'
+   }
+];
 
-      // PIN logic
-      const savedPin = localStorage.getItem(PIN_KEY);
-      if (savedPin) {
-        showDashboard();
-      } else {
-        inputs[0].focus();
-      }
+            // --- DOM Elements ---
+            const modalOverlay = document.getElementById('modal-overlay');
+            const usernameForm = document.getElementById('username-form');
+            const usernameInput = document.getElementById('username-input');
+            const greetingEl = document.getElementById('greeting');
+            const usernameDisplayEl = document.getElementById('username-display');
+            const clockEl = document.getElementById('clock');
+            const launcherContainer = document.getElementById('launcher-container');
+            const carouselTrack = document.getElementById('carousel-track');
+            const appTitle = document.getElementById('app-title');
+            const appDescription = document.getElementById('app-description');
+            const launchButton = document.getElementById('launch-button');
 
-      inputs.forEach((inp, i) => {
-        inp.addEventListener('input', () => {
-          if (inp.value && i < inputs.length - 1) {
-            inputs[i+1].focus();
-          }
-          if (inputs.every(i => i.value)) {
-            const entered = inputs.map(i=>i.value).join('');
-            if (!savedPin) {
-              localStorage.setItem(PIN_KEY, entered);
-              showDashboard();
-            } else if (entered === savedPin) {
-              showDashboard();
-            } else {
-              inputs.forEach(i=>i.value='');
-              inputs[0].focus();
+            let currentIndex = 0;
+
+            // --- Core Functions ---
+            
+            function setActiveItem(index) {
+                currentIndex = index;
+                const site = sites[index];
+
+                // Update background and info panel
+                launcherContainer.style.backgroundImage = `url('${site.image}')`;
+                appTitle.textContent = site.name;
+                appDescription.textContent = site.description;
+                launchButton.href = site.url;
+
+                // Update carousel items
+                document.querySelectorAll('.carousel-item').forEach((item, i) => {
+                    item.classList.toggle('active', i === index);
+                });
+
+                // Move track to center the active item
+                const activeItem = document.querySelector('.carousel-item.active');
+                if (activeItem) {
+                    const trackPadding = parseInt(window.getComputedStyle(carouselTrack).paddingLeft);
+                    const itemWidth = activeItem.offsetWidth;
+                    const itemMargin = parseInt(window.getComputedStyle(activeItem).marginRight);
+                    // We want the active item to be just off-center to the left, like SteamOS
+                    const screenCenter = window.innerWidth / 2;
+                    const itemCenter = activeItem.offsetLeft + (itemWidth / 2);
+                    const desiredOffset = screenCenter - (itemWidth * 1.1) ; // Pull left of center
+                    
+                    let newTransform = itemCenter - desiredOffset;
+                    
+                    // Clamp the transform value so we don't have empty space at the start/end
+                    const maxTransform = carouselTrack.scrollWidth - window.innerWidth + trackPadding;
+                    newTransform = Math.max(0, Math.min(newTransform, maxTransform));
+                    
+                    carouselTrack.style.transform = `translateX(-${newTransform}px)`;
+                }
             }
-          }
+
+            function generateCarousel() {
+                carouselTrack.innerHTML = '';
+                sites.forEach((site, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'carousel-item';
+                    item.style.backgroundImage = `url('${site.image}')`;
+                    item.dataset.index = index;
+
+                    item.addEventListener('click', () => {
+                        setActiveItem(index);
+                    });
+
+                    carouselTrack.appendChild(item);
+                });
+            }
+
+            function updateGreeting(name) {
+                const hour = new Date().getHours();
+                let timeOfDayGreeting = 'Good Evening';
+                if (hour < 12) { timeOfDayGreeting = 'Good Morning'; }
+                else if (hour < 18) { timeOfDayGreeting = 'Good Afternoon'; }
+                greetingEl.textContent = timeOfDayGreeting;
+                usernameDisplayEl.textContent = name;
+            }
+            
+            function updateClock() {
+                const now = new Date();
+                clockEl.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+            }
+
+            function initializeUser() {
+                const savedUsername = localStorage.getItem('webLauncherUsername');
+                if (savedUsername) {
+                    updateGreeting(savedUsername);
+                    modalOverlay.classList.remove('visible');
+                } else {
+                    modalOverlay.classList.add('visible');
+                    usernameInput.focus();
+                }
+            }
+            
+            usernameForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const username = usernameInput.value.trim();
+                if (username) {
+                    localStorage.setItem('webLauncherUsername', username);
+                    updateGreeting(username);
+                    modalOverlay.classList.remove('visible');
+                }
+            });
+
+            // --- Initial Execution ---
+            initializeUser();
+            generateCarousel();
+            if (sites.length > 0) {
+                setActiveItem(0); // Set the first item as active by default
+            }
+            updateClock();
+            setInterval(updateClock, 10000); // Update clock every 10 seconds
         });
-      });
+    </script>
 
-      // Fetch favicon (via Google service)
-      function getIcon(url) {
-        try {
-          const d = new URL(url).hostname;
-          return `https://www.google.com/s2/favicons?domain=${d}`;
-        } catch {
-          return '';
-        }
-      }
-
-      // Render sites in current view
-      function renderSites() {
-        sitesContainer.innerHTML = '';
-        sitesContainer.className = view;
-        sites.forEach((site, idx) => {
-          const card = document.createElement('div');
-          card.className = 'card glass';
-          card.innerHTML = `
-            <img src="${getIcon(site.url)}" alt="">
-            <div>${site.name}</div>
-          `;
-          card.addEventListener('click', () => openSite(site.url));
-          sitesContainer.appendChild(card);
-        });
-      }
-
-      // Open in iframe
-      function openSite(url) {
-        iframe.src = url;
-        iframeContainer.style.display = 'block';
-      }
-      closeIframe.addEventListener('click', () => {
-        iframeContainer.style.display = 'none';
-        iframe.src = '';
-      });
-
-      // Add new site
-      addBtn.addEventListener('click', () => {
-        const name = prompt('Site name:');
-        const url = prompt('Site URL (include https://):');
-        if (name && url) {
-          sites.push({ name, url });
-          localStorage.setItem(SITES_KEY, JSON.stringify(sites));
-          renderSites();
-        }
-      });
-
-      // Toggle views
-      viewBtns.forEach(b => {
-        b.addEventListener('click', () => {
-          view = b.dataset.view;
-          renderSites();
-        });
-      });
-    })();
-  </script>
 </body>
 </html>
